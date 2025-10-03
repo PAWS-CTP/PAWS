@@ -16,7 +16,12 @@ const Navbar: React.FC = () => {
             backgroundColor: '#fff',
             color: '#fff'
         }}>
-            <div style={{ fontWeight: 'bold', fontSize: '1.5rem', color: '#258EA6' }}>
+            <div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', color: '#258EA6' }}>
+                <img
+                    src="/src/assets/PAWS_Logo_NoText.png"
+                    alt="PAWS LOGO"
+                    style={{ height: '40px', marginRight: '0.5rem' }}
+                />
                 PAWS
             </div>
             <ul style={{
