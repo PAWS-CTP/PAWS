@@ -1,18 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
+import "./post.css"
 
 type PostProps = {
   user: string;
+  userProfilePicUrl: string;
   imageUrl: string;
   caption: string;
   timestamp: number;
+  initialLikes?: number;
 };
 
-export default function Post({ user, imageUrl, caption, timestamp }: PostProps) {
+export default function Post({ user, userProfilePicUrl, imageUrl, caption, timestamp, initialLikes }: PostProps) {
+  const [likes, setLikes] = useState(initialLikes || 0);
+  const [liked, setLiked] = useState(false);
+
+  const handleLike = () => {
+    if (liked) {
+      setLikes(likes - 1);
+    } else {
+      setLikes(likes + 1);
+    }
+    setLiked(!liked);
+  };
   return (
-    <div style={{ border: "1px solid gray", padding: "1rem", margin: "1rem 0" }}>
-      <h2 style={{color:'#549f93'}}>{user} | {timestamp}</h2>
-      <img src={imageUrl} alt="PetImage" style={{ width: "50%", height: "50%", borderRadius: "8px" }} />
-      <p>{caption}</p>
+    <div className="post-container">
+      <div className="post-header">
+        <img className="post-avatar" src={userProfilePicUrl} alt="User Avatar" />
+        <h2 className="post-username text-color">{user}</h2>
+        <h2 className="post-timestamp">{new Date(timestamp).toLocaleString()}</h2>
+      </div>
+      
+      <img className="post-image" src={imageUrl} alt="Pet" />
+      <p className="post-caption text-color">{caption}</p>
+      
+      <div className="post-footer">
+      <button className={`like-button${liked ? " liked" : ""}`} onClick={handleLike}>
+        {liked ? "♥" : "♡"} ({likes})
+      </button>
+      </div>
     </div>
   );
 }
