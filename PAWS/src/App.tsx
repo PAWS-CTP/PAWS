@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 
-import Navbar from './components/navbar'
+import Navbar from './components/navbar/navbar.tsx'
 import Post from './components/post/post.tsx'
 
 function App() {
