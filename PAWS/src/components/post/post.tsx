@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import type { Comment } from '../comment/comment';
 import "./post.css"
+
 
 type PostProps = {
   user: string;
@@ -8,11 +10,13 @@ type PostProps = {
   caption: string;
   timestamp: number;
   initialLikes?: number;
+  initialComments?: Comment[];
 };
 
-export default function Post({ user, userProfilePicUrl, imageUrl, caption, timestamp, initialLikes }: PostProps) {
+export default function Post({ user, userProfilePicUrl, imageUrl, caption, timestamp, initialLikes, initialComments = [] }: PostProps) {
   const [likes, setLikes] = useState(initialLikes || 0);
   const [liked, setLiked] = useState(false);
+  const [comment, setComment] = useState<Comment[]>(initialComments);
 
   const handleLike = () => {
     if (liked) {
