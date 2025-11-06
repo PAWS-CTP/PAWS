@@ -1,7 +1,7 @@
 import React from 'react';
 import './comment.css';
 
-// Type for the comment data
+
 export type Comment = {
     id: number;           // for uniquely identifying each comment
     text: string;         // the comment content
@@ -10,7 +10,7 @@ export type Comment = {
     userProfilePicUrl: string;  // commenter's profile picture
 }
 
-// The Comment component that displays a single comment
+
 export default function Comment({ text, username, timestamp, userProfilePicUrl }: Comment) {
     return (
         <div className="comment">
