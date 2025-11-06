@@ -54,3 +54,50 @@
 .like-button.liked {
   color: #e0245e; 
 }
+
+/* Comments section styles */
+.comments-section {
+  margin-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1rem;
+}
+
+.comments-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+  
+}
+
+.comment-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  
+}
+
+.comment-submit {
+  padding: 8px 16px;
+  background-color: #549f93;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.comment-submit:hover {
+  background-color: #468b80;
+}
+.comment-avatar {
+    width: 5px
+    height: 5px
+}
