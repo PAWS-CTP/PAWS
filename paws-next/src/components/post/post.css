@@ -15,8 +15,10 @@
 }
 
 .post-image {
-  width: 95%;
+  width: 100%;
+  height: auto;
   border-radius: 8px;
+  object-fit: cover;
 }
 
 .post-timestamp {
@@ -98,8 +100,8 @@
   background-color: #468b80;
 }
 .comment-avatar {
-    width: 5px;
-    height: 5px;
+    width: 21px;
+    height: 21px;
     border-radius: 50%;
     background-color: #549f93;
     margin-right: 8px;

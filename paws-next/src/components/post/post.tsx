@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import Comment, { type Comment as CommentType } from '../comment/comment';
 import "./post.css"
@@ -57,10 +58,7 @@ export default function Post({ user, userProfilePicUrl, imageUrl, caption, times
         <button className={`like-button${liked ? " liked" : ""}`} onClick={handleLike}>
           {liked ? "♥" : "♡"} ({likes})
         </button>
-
-        {/* Comments Section */}
         <div className="comments-section">
-          {/* Display existing comments */}
           <div className="comments-list">
             {comments.map(comment => (
               <Comment key={comment.id} {...comment} />

@@ -1,4 +1,7 @@
+"use client";
 import React, { useState } from 'react';
+import Image from 'next/image';
+import pawsLogo from '../../assets/PAWS_Logo_NoText.png';
 
 const Navbar: React.FC = () => {
     const [search, setSearch] = useState('');
@@ -17,12 +20,6 @@ const Navbar: React.FC = () => {
             color: '#fff'
         }}>
             <div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.5rem', color: '#258EA6' }}>
-                <img
-                    src="/src/assets/PAWS_Logo_NoText.png"
-                    alt="PAWS LOGO"
-                    style={{ height: '40px', marginRight: '0.5rem' }}
-                />
-                PAWS
             </div>
             <ul style={{
                 listStyle: 'none',
