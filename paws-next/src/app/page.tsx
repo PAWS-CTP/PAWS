@@ -9,7 +9,6 @@ function App() {
     <>
       <Navbar />
       <div>
-        <main>
           <div className="flex flex-row">
             <div className="basis-64" style={{ textAlign: 'center' }}>
               <Sidebar />
@@ -31,7 +30,6 @@ function App() {
               />
             </div>
           </div>
-        </main>
       </div>
     </>
   );
