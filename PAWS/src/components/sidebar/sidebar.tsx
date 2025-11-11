@@ -1,5 +1,4 @@
 const links = [
-  { href: '/', label: 'Home' },
   { href: '/feed', label: 'Feed' },
   { href: '/profile', label: 'Profile' },
   { href: '/messages', label: 'Messages' },

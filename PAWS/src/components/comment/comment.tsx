@@ -19,8 +19,6 @@ export default function Comment({ text, username, timestamp, userProfilePicUrl }
                     className="comment-avatar" 
                     src={userProfilePicUrl} 
                     alt={`${username}'s avatar`}
-                    width="21.33px"
-                    height="21.33px"
                 />
                 <span className="comment-username text-color"> {username} </span>
             </div>
