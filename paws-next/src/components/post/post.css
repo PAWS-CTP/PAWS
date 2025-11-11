@@ -98,6 +98,9 @@
   background-color: #468b80;
 }
 .comment-avatar {
-    width: 21px;
-    height: 21px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #549f93;
+    margin-right: 8px;
 }
