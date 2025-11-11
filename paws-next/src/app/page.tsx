@@ -4,11 +4,12 @@ import Sidebar from '../components/sidebar/sidebar';
 import Post from '../components/post/post';
 
 
+
 function App() {
   return (
     <>
       <Navbar />
-      <div>
+      <div className='bg-gray-50'>
           <div className="flex flex-row">
             <div className="basis-64" style={{ textAlign: 'center' }}>
               <Sidebar />

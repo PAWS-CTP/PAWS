@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div style={{ display: "flex" }}>
+      <div className="bg-gray-50" style={{ display: "flex" }}>
         <Sidebar />
         <div style={{ flex: 1 }}>
         <div className="p-10">
