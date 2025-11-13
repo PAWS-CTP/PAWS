@@ -22,11 +22,11 @@ Community Feed – Discover trending pets, posts, and upcoming events.
 
 🛠️ Tech Stack
 
-Frontend: React + TailwindCSS
+Frontend: React + TailwindCSS + Next.JS
 
 Backend: Node.js / Express
 
-Database: MongoDB or PostgreSQL
+Database: Supabase
 
 Authentication: JWT / OAuth
 
