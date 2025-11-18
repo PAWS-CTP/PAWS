@@ -22,7 +22,6 @@ const Navbar: React.FC = () => {
                             </button>
                         </div>
             <ul className="paws-navlist">
-                {/** useRouter for client navigation */}
                 <NavItems />
             </ul>
             <input

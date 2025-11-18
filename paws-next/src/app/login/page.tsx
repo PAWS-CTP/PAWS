@@ -18,7 +18,7 @@ export default function LoginPage() {
   }, [session, router]);
 
   async function handleLocalLogin() {
-    // Attempt credentials sign-in (requires a credentials provider configured server-side)
+    
     const res: any = await signIn("credentials", { redirect: false, username, password });
     if (res && res.ok) {
       router.push("/");
