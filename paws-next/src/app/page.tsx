@@ -8,8 +8,9 @@ import { redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await getServerSession(authOptions as any);
-  if (!session) {
-    // If not signed in, redirect to the login page
+  const devBypass = process.env.NODE_ENV === "development" || process.env.DEV_BYPASS_AUTH === "true";
+  if (!session && !devBypass) {
+    // If not signed in (and not bypassing in development), redirect to the login page
     redirect("/login");
   }
 

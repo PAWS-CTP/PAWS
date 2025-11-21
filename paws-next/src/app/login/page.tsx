@@ -2,6 +2,7 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import "./login.css";
+import Link from "next/link";
 import logo from "../../assets/PAWS_Logo_NoText.png";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -80,6 +81,26 @@ export default function LoginPage() {
 
               <div style={{ fontSize: 13, color: "#666", marginTop: 12 }}>
                 Don't have an account? <a href="/signup" style={{ color: "var(--primary-color)" }}>Sign up</a>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  style={{
+                    display: "inline-block",
+                    width: "100%",
+                    padding: 10,
+                    borderRadius: 8,
+                    border: "none",
+                    background: "var(--primary-color)",
+                    color: "#fff",
+                    textAlign: "center",
+                    textDecoration: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  Go to feed
+                </button>
               </div>
             </>
           )}

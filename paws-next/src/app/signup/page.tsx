@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import "../login/login.css";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -89,6 +90,26 @@ export default function SignupPage() {
         </form>
         <div style={{ marginTop: 12, fontSize: 13, color: "#666" }}>
           Already have an account? <a href="/login" style={{ color: "var(--primary-color)" }}>Sign in</a>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            style={{
+              display: "inline-block",
+              width: "100%",
+              padding: 10,
+              borderRadius: 8,
+              border: "none",
+              background: "var(--primary-color)",
+              color: "#fff",
+              textAlign: "center",
+              textDecoration: "none",
+              cursor: "pointer"
+            }}
+          >
+            Go to feed
+          </button>
         </div>
       </div>
     </div>
