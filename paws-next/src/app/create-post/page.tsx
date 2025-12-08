@@ -54,8 +54,7 @@ export default function CreatePostPage() {
             onSubmit={handleSubmit}
             className="flex flex-col space-y-4 max-w-lg"
           >
-            {/* Image Preview */}
-            {preview ? (
+            {preview ? ( //image preview
               <img
                 src={preview}
                 alt="Preview"
@@ -67,8 +66,7 @@ export default function CreatePostPage() {
               </div>
             )}
 
-            {/* Hidden File Input */}
-            <input
+            <input // file input
               type="file"
               accept="image/*"
               ref={fileInputRef}
@@ -76,8 +74,7 @@ export default function CreatePostPage() {
               className="hidden"
             />
 
-            {/* Upload Button */}
-            <button
+            <button // upload button
               type="button"
               onClick={handleUploadClick}
               className="bg-[#258EA6] text-white px-4 py-2 rounded-lg hover:bg-[#1f6e85] transition font-medium"
@@ -85,8 +82,7 @@ export default function CreatePostPage() {
               Upload Image
             </button>
 
-            {/* Caption Input */}
-            <textarea
+            <textarea // caption input
               placeholder="Write a cute caption..."
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
