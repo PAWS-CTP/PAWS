@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { signOut } from 'next-auth/react';
+import supabase from '@/lib/supabaseClient'
 import Image from 'next/image';
 import pawsLogo from '../../assets/PAWS_Logo_NoText.png';
 import { useRouter } from 'next/navigation';
@@ -31,6 +31,8 @@ const Navbar: React.FC = () => {
                 <NavItems />
             </ul>
             <SearchBar onSearch={handleSearch} />
+
+            
         </nav>
     );
 };
@@ -75,7 +77,18 @@ function NavItems() {
             </li>
             <li>
                 <button
-                    onClick={() => signOut({ callbackUrl: '/login' })}
+                    onClick={async () => {
+                        try {
+                            if (supabase && supabase.auth && typeof supabase.auth.signOut === 'function') {
+                                await supabase.auth.signOut()
+                            }
+                        } catch (err) {
+                            // eslint-disable-next-line no-console
+                            console.warn('Sign out failed:', err)
+                        } finally {
+                            router.push('/signin')
+                        }
+                    }}
                     className={`paws-nav-btn ${isActive('/logout') ? 'active' : 'link paws-signout'}`}
                     aria-label="Sign out"
                 >

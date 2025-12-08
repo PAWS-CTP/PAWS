@@ -1,117 +1,60 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import "../login/login.css";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import React, { useState } from 'react'
+import supabase from '@/lib/supabaseClient'
+import { useRouter } from 'next/navigation'
 
-export default function SignupPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
+export default function SignUpPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  async function handleSignUp(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
     if (!email || !password) {
-      alert("Please provide email and password");
-      return;
+      setError('Please provide email and password')
+      return
     }
-    if (password !== confirm) {
-      alert("Passwords do not match");
-      return;
+    try {
+      setLoading(true)
+      const { data, error: signErr } = await supabase.auth.signUp({ email, password } as any)
+      if (signErr) {
+        setError(signErr.message)
+        setLoading(false)
+        return
+      }
+
+      // Optionally you could save username to your profile table via API
+      // For now redirect to sign-in page or root
+      router.push('/signin')
+    } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err)
+      setError(err?.message ?? 'Sign up failed')
+    } finally {
+      setLoading(false)
     }
-    // Placeholder: account creation backend not implemented
-    alert("Account creation not wired. This is a placeholder.");
-    // Optionally redirect to login after 'creation'
-    router.push("/login");
-  };
+  }
 
-    return (
-    <div className="login-root">
-      <div className="login-card">
-        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-          <div style={{ marginBottom: 12 }}>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Full name"
-              style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #e6e6e6" }}
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              type="email"
-              style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #e6e6e6" }}
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              type={showPassword ? "text" : "password"}
-              style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #e6e6e6" }}
-            />
-          </div>
-          <div style={{ marginBottom: 8 }}>
-            <input
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Confirm password"
-              type={showPassword ? "text" : "password"}
-              style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #e6e6e6" }}
-            />
-          </div>
-
-          <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input id="show-pw" type="checkbox" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} />
-            <label htmlFor="show-pw" style={{ fontSize: 13, color: '#666' }}>Show password</label>
-          </div>
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              padding: 10,
-              borderRadius: 8,
-              border: "none",
-              background: "var(--primary-color)",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            Create account
-          </button>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-sm w-96">
+        <h2 className="text-2xl font-semibold mb-4 text-center">Create an account</h2>
+        <form onSubmit={handleSignUp} className="flex flex-col gap-3">
+          <input className="border p-2 rounded" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input className="border p-2 rounded" placeholder="Username (optional)" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input className="border p-2 rounded" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+          <button disabled={loading} className="bg-blue-500 text-white py-2 rounded mt-1">{loading ? 'Creating…' : 'Sign Up'}</button>
         </form>
-        <div style={{ marginTop: 12, fontSize: 13, color: "#666" }}>
-          Already have an account? <a href="/login" style={{ color: "var(--primary-color)" }}>Sign in</a>
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <button
-            type="button"
-            onClick={() => router.push('/')}
-            style={{
-              display: "inline-block",
-              width: "100%",
-              padding: 10,
-              borderRadius: 8,
-              border: "none",
-              background: "var(--primary-color)",
-              color: "#fff",
-              textAlign: "center",
-              textDecoration: "none",
-              cursor: "pointer"
-            }}
-          >
-            Go to feed
-          </button>
+        <div className="text-sm text-center text-gray-600 mt-4">
+          Already have an account? <a href="/signin" className="text-blue-500">Sign in</a>
         </div>
       </div>
     </div>
-  );
+  )
 }

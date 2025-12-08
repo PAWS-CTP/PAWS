@@ -4,6 +4,7 @@ import "./globals.css";
 // Import sidebar styles globally so the component's classnames are styled
 import "../components/sidebar/sidebar.css";
 import Providers from "./providers";
+import ThemeToggle from '@/components/themeToggle/themeToggle';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <ThemeToggle />
+        </Providers>
       </body>
     </html>
   );

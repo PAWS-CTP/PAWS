@@ -1,60 +1,96 @@
-/* Navbar styles moved from inline to CSS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+    --navbar-font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
 .paws-navbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 1rem 2rem;
-	background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--navbar-height, 72px);
+    padding: 0 1.25rem;
+    background-color: #fff;
+    z-index: 1000;
+    box-shadow: 0 2px 12px rgba(15,23,42,0.08);
+    font-family: var(--navbar-font);
 }
 
 .paws-brand {
-	display: flex;
-	align-items: center;
-	font-weight: bold;
-	font-size: 1.5rem;
-	color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    gap: 0.5rem;
 }
 
 .paws-navlist {
-	list-style: none;
-	display: flex;
-	gap: 1.5rem;
-	margin: 0;
-	padding: 0;
-	align-items: center;
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    /* allow the navlist to grow and center its items between brand and search */
+    flex: 1 1 auto;
+    justify-content: center;
 }
 
 .paws-nav-btn {
-	background: transparent;
-	border: none;
-	cursor: pointer;
-	font-size: 1rem;
-	padding: 4px 6px;
-	transition: color 160ms ease, transform 120ms ease;
-	outline: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    padding: 6px 8px;
+    transition: color 160ms ease, transform 120ms ease, text-shadow 160ms ease;
+    outline: none;
+    font-weight: 600;
+    letter-spacing: 0.12px;
+    /* subtle modern rounded touch */
+    border-radius: 8px;
+    /* text outline: prefer stroke, fallback to layered text-shadow */
+    -webkit-text-stroke: 0.6px rgba(0,0,0,0.06);
+    text-shadow:
+        0 0 0 rgba(0,0,0,0),
+        1px 1px 0 rgba(0,0,0,0.04),
+        -1px -1px 0 rgba(0,0,0,0.04),
+        1px -1px 0 rgba(0,0,0,0.03),
+        -1px 1px 0 rgba(0,0,0,0.03);
 }
 
-
 /* default variations */
-.paws-nav-btn.feed { color: var(--primary-color); font-weight: 400; }
+.paws-nav-btn.feed { color: var(--primary-color); }
 .paws-nav-btn.link { color: var(--primary-color); }
 
 /* active page state (highlights whichever page you're on) */
 .paws-nav-btn.active {
-	color: var(--secondary-color);
-	font-weight: 700;
+    color: var(--secondary-color);
+    font-weight: 800;
+    -webkit-text-stroke: 0.9px rgba(0,0,0,0.06);
+    text-shadow:
+        0 0 0 rgba(0,0,0,0),
+        1px 1px 0 rgba(0,0,0,0.06),
+        -1px -1px 0 rgba(0,0,0,0.06),
+        1px -1px 0 rgba(0,0,0,0.05),
+        -1px 1px 0 rgba(0,0,0,0.05);
 }
 
 /* Hover and focus states for accessibility */
 .paws-nav-btn:hover,
 .paws-nav-btn:focus {
-	color: var(--secondary-color);
-	transform: translateY(-1px);
+    color: var(--secondary-color);
+    transform: translateY(-2px);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.06);
 }
 
 .paws-nav-btn:focus {
-	box-shadow: 0 0 0 3px rgba(37,142,166,0.12);
-	border-radius: 6px;
+    box-shadow: 0 0 0 3px rgba(37,142,166,0.12);
+    border-radius: 6px;
 }
 
 .paws-search {
@@ -116,22 +152,53 @@
 }
 
 .paws-signout {
-	color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .paws-logo-img {
-	width: 36px;
-	height: 36px;
-	margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
 }
 
+/* theme toggle was moved to a floating component: see src/components/themeToggle */
+
 .paws-logo-button {
-	background: transparent;
-	border: none;
-	padding: 0;
-	margin: 0;
-	display: inline-flex;
-	align-items: center;
-	cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* small responsive adjustments */
+@media (max-width: 640px) {
+    .paws-search { display: none; }
+}
+
+/* Floating create-post button */
+.create-post-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 8px 20px rgba(37,142,166,0.12);
+    border: none;
+    cursor: pointer;
+    z-index: 1200;
+}
+
+.create-post-fab:hover { transform: translateY(-3px); }
+
+@media (max-width: 640px) {
+    .create-post-fab { right: 16px; bottom: 18px; width: 48px; height: 48px; }
 }
 

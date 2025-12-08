@@ -1,0 +1,38 @@
+/* Modern comment styles for feed */
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.02);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-username {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-color-accent, #549f93);
+}
+
+.comment-text {
+  margin: 0;
+  color: var(--text-color, #333);
+}
+
+.comment-timestamp {
+  font-size: 0.75rem;
+  color: #9aa6af;
+}

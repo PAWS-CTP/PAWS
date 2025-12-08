@@ -1,0 +1,30 @@
+.floating-theme-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border, #e6edf2);
+  box-shadow: 0 8px 20px rgba(2,6,23,0.08);
+  z-index: 1400;
+  cursor: pointer;
+  transition: transform 120ms ease, background 160ms ease, color 160ms ease;
+}
+
+.floating-theme-toggle:hover { transform: translateY(-3px); }
+
+[data-theme="dark"] .floating-theme-toggle {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-secondary);
+  border-color: rgba(255,255,255,0.06);
+}
+
+@media (max-width: 640px) {
+  .floating-theme-toggle { right: 14px; bottom: 14px; width: 44px; height: 44px; }
+}
