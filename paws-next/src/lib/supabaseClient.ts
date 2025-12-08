@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Use public env vars for client-side Supabase access. Do NOT put service_role keys here.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 

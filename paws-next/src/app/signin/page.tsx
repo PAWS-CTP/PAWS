@@ -16,7 +16,10 @@ export default function SignInPage() {
   async function handleGoogleSignIn() {
     try {
       setLoading(true)
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+      // Request Supabase to redirect back to the feed after the OAuth flow completes.
+      // Must match an entry in Supabase Auth -> Settings -> Redirect URLs.
+      const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } as any } as any)
       if (error) {
         alert(error.message)
         setLoading(false)
@@ -30,6 +33,25 @@ export default function SignInPage() {
     }
   }
 
+  // If user already has a session (returned from Supabase after OAuth), send them to feed.
+  React.useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!mounted) return
+        if (data?.session) {
+          router.push('/')
+        }
+      } catch (e) {
+        // ignore
+      }
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [router])
+
   async function handlePasswordSignIn(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -37,9 +59,29 @@ export default function SignInPage() {
       setError('Please enter username (or email) and password')
       return
     }
-    // Temporary bypass: just go to the feed for now
-    // (Will be replaced with real auth once Supabase is configured)
-    router.push('/')
+    setLoading(true)
+    try {
+      // Assumes `username` is an email. If you allow usernames, resolve to email server-side.
+      const { data, error: signErr } = await supabase.auth.signInWithPassword({
+        email: username,
+        password,
+      } as any)
+
+      setLoading(false)
+
+      if (signErr) {
+        setError(signErr.message || 'Sign in failed')
+        return
+      }
+
+      // Signed in successfully — redirect to feed
+      router.push('/')
+    } catch (err: any) {
+      setLoading(false)
+      // If the client was not properly configured, the stub may throw.
+      const msg = err?.message || 'Sign in failed'
+      setError(msg)
+    }
   }
 
   return (
