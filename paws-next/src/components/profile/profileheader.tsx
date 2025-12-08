@@ -1,22 +1,75 @@
-import React from 'react';
+"use client"
 
-function ProfileHeader() {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-      <img 
-        src="https://thumbs.dreamstime.com/b/cute-cat-portrait-square-photo-beautiful-white-closeup-105311158.jpg"
-        width="90"
-        height="90"
-        style={{ borderRadius: "50%" }}
-      />
+import React, { useEffect, useState } from 'react'
+import supabase from '@/lib/supabaseClient'
 
-      {/* Stack Username and Bio vertically */}
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <h2 style={{ color: "#EC22FF",fontWeight: 'bold' }}>Username</h2>
-        <p>Bio blah blah blah blah</p>
-      </div>
-    </div>
-  );
+type Profile = {
+  id?: string
+  username?: string | null
+  avatar_url?: string | null
+  bio?: string | null
+  [key: string]: any
 }
 
-export default ProfileHeader;
+export default function ProfileHeader() {
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+
+    async function load() {
+      try {
+        const {
+          data: { session }
+        } = await supabase.auth.getSession()
+
+        const userId = session?.user?.id
+        if (!userId) {
+          if (mounted) setLoading(false)
+          return
+        }
+
+        const { data, error } = await supabase.from('users').select('*').eq('id', userId).limit(1).single()
+        if (error) {
+          // If the table/row doesn't exist, we still show a fallback
+          // eslint-disable-next-line no-console
+          console.warn('Could not load profile row:', error)
+        }
+
+        if (mounted) setProfile(data ?? null)
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Error loading profile:', err)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const username = profile?.username || profile?.full_name || profile?.name || 'You'
+  const avatar = profile?.avatar_url || profile?.avatar || profile?.profile_image_url || 'https://thumbs.dreamstime.com/b/cute-cat-portrait-square-photo-beautiful-white-closeup-105311158.jpg'
+  const bio = profile?.bio || ''
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <img
+        src={avatar}
+        width={90}
+        height={90}
+        style={{ borderRadius: '50%', objectFit: 'cover' }}
+        alt={`${username}'s avatar`}
+      />
+
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <h2 style={{ color: '#EC22FF', fontWeight: 'bold' }}>{loading ? 'Loading…' : username}</h2>
+        {bio ? <p style={{ marginTop: 4 }}>{bio}</p> : <p style={{ marginTop: 4, color: '#666' }}>No bio yet</p>}
+      </div>
+    </div>
+  )
+}
