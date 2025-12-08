@@ -53,19 +53,10 @@ export default function ProfileHeader() {
   }, [])
 
   const username = profile?.username || profile?.full_name || profile?.name || 'You'
-  const avatar = profile?.avatar_url || profile?.avatar || profile?.profile_image_url || 'https://thumbs.dreamstime.com/b/cute-cat-portrait-square-photo-beautiful-white-closeup-105311158.jpg'
   const bio = profile?.bio || ''
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-      <img
-        src={avatar}
-        width={90}
-        height={90}
-        style={{ borderRadius: '50%', objectFit: 'cover' }}
-        alt={`${username}'s avatar`}
-      />
-
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <h2 style={{ color: '#EC22FF', fontWeight: 'bold' }}>{loading ? 'Loading…' : username}</h2>
         {bio ? <p style={{ marginTop: 4 }}>{bio}</p> : <p style={{ marginTop: 4, color: '#666' }}>No bio yet</p>}
