@@ -4,14 +4,20 @@ import { signOut } from 'next-auth/react';
 import Image from 'next/image';
 import pawsLogo from '../../assets/PAWS_Logo_NoText.png';
 import { useRouter } from 'next/navigation';
+import SearchBar from '../search/searchbar';
 import './navbar.css';
 
 const Navbar: React.FC = () => {
-    const [search, setSearch] = useState('');
     const router = useRouter();
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+    const handleSearch = ({ city }: { city?: string }) => {
+        // For now: send the city to the feed via query string.
+        // Later your feed can read ?city=... and filter events.
+        if (city) {
+            router.push(`/?city=${encodeURIComponent(city)}`);
+        } else {
+            router.push('/');
+        }
     };
 
     return (
@@ -24,13 +30,7 @@ const Navbar: React.FC = () => {
             <ul className="paws-navlist">
                 <NavItems />
             </ul>
-            <input
-                type="text"
-                placeholder="Search..."
-                value={search}
-                onChange={handleSearchChange}
-                className="paws-search"
-            />
+            <SearchBar onSearch={handleSearch} />
         </nav>
     );
 };
