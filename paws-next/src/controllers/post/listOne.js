@@ -1,13 +1,7 @@
-const listOne = async (req, res) => {
-    const {
-      db: { Post },
-      params: { id },
-    } = req;
-  
-    const post = await Post.find(id);
-    if (!post) return res.sendStatus(404);
-  
+const listPosts = async (req, res) => {
+    const { Post } = req.db;
+    const post = await Post.list();
     res.send(post);
   };
   
-  module.exports = listOne;
+  module.exports = listPosts;
