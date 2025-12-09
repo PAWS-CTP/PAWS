@@ -2,6 +2,8 @@ import ProfileHeader from "@/components/profile/profileheader"
 import ProfilePost from "@/components/profile/profileposts"
 import Navbar from "@/components/navbar/navbar"
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Edit } from 'lucide-react'
 
 // Temporary static post IDs (replace with real data fetch later)
 const samplePosts = [
@@ -17,19 +19,22 @@ export default function Home() {
       <Navbar />
       <div className="bg-gray-50" style={{ paddingTop: 'var(--navbar-height,72px)' }}>
         <div className="flex justify-center">
-          <div style={{ width: '100%', maxWidth: 920 }}>
-            <div className="p-10 flex items-start justify-between gap-6">
-              <div style={{ flex: 1 }}>
+          <div className="w-full max-w-5xl px-4">
+            <div className="py-10 grid grid-cols-1 md:grid-cols-[1fr_auto] items-start gap-6">
+              <div>
                 <ProfileHeader />
               </div>
-              <div style={{ width: 160 }} className="flex items-center justify-end">
+              <div className="flex items-start justify-end">
                 <Link href="/profile/edit">
-                  <button className="text-white py-2 px-4 rounded" style={{ background: 'var(--primary-color)' }}>Edit Profile</button>
+                  <Button variant="primary" className="py-2 px-3 inline-flex items-center gap-2">
+                    <Edit size={16} />
+                    Edit Profile
+                  </Button>
                 </Link>
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-6 p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-4">
               {samplePosts.map((id) => (
                 <ProfilePost key={id} id={id} />
               ))}

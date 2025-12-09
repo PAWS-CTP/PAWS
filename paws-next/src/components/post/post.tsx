@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import Comment, { type Comment as CommentType } from "../comment/comment";
-import "./post.css";
 import { supabase } from "@/lib/supabaseClient";
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Heart, MessageSquare } from 'lucide-react'
 /**
  * Current shape of the `events` table.
  * Update this later if you add more columns (user_id, like_count, etc.).
@@ -121,71 +123,64 @@ export default function Post({
   };
 
   return (
-    <div className="post-container">
-      {/* HEADER: event info only for now */}
-      <div className="post-header">
-        <div className="post-header-text">
-          <h2 className="post-title text-color">
-            {title || "Untitled event"}
-          </h2>
-
-          <div className="post-meta">
-            <span className="post-timestamp">
+    <Card className="mb-6">
+      <CardHeader>
+        <div className="flex items-start justify-between w-full">
+          <div>
+            <h3 className="text-lg font-semibold">{title || "Untitled event"}</h3>
+            <div className="text-sm text-muted-foreground mt-1">
               {eventDate}
               {start && end && ` · ${start} – ${end}`}
-            </span>
-            {location && (
-              <span className="post-location"> · 📍 {location}</span>
-            )}
+              {location && ` · 📍 ${location}`}
+            </div>
           </div>
         </div>
-      </div>
+      </CardHeader>
 
-      {/* IMAGE from events.img_url */}
-      {img_url && (
-        <img
-          className="post-image"
-          src={img_url}
-          alt={title || "Event image"}
-        />
-      )}
-
-      {/* DESCRIPTION from events.description */}
-      {description && (
-        <p className="post-caption text-color">{description}</p>
-      )}
-
-      {/* FOOTER – likes + comments*/}
-      <div className="post-footer">
-        <button
-          className={`like-button${liked ? " liked" : ""}`}
-          onClick={handleLike}
-        >
-          {liked ? "♥" : "♡"} ({likes})
-        </button>
-
-        <div className="comments-section">
-          <div className="comments-list">
-            {comments.map((comment) => (
-              <Comment key={comment.id} {...comment} />
-            ))}
+      <CardContent>
+        {img_url && (
+          <div className="w-full rounded overflow-hidden mb-4">
+            <img src={img_url} alt={title || "Event image"} className="w-full h-80 object-cover" />
           </div>
+        )}
 
-          <form className="comment-form text-color" onSubmit={handleAddComment}>
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              className="comment-input text-color"
-            />
-            <button type="submit" className="comment-submit">
-              Post
-            </button>
-          </form>
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
+      </CardContent>
+
+      <CardFooter>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={handleLike} className="inline-flex items-center gap-2">
+            <Heart className={`transition ${liked ? 'text-red-500' : 'text-gray-500'}`} />
+            <span>{likes}</span>
+          </Button>
+
+          <div className="flex-1">
+            <div className="space-y-3">
+              {comments.map((comment) => (
+                <Comment key={comment.id} {...comment} />
+              ))}
+            </div>
+
+            <form className="mt-3 flex gap-2" onSubmit={handleAddComment}>
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add a comment..."
+                className="flex-1 rounded-md border px-3 py-2 text-sm"
+              />
+              <Button
+                size="sm"
+                type="submit"
+                className="bg-[var(--primary-color)] text-white hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[color:var(--primary-color)/0.45] active:scale-95 transition-transform"
+              >
+                Post
+              </Button>
+            </form>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
 

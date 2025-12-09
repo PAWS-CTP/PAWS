@@ -6,6 +6,8 @@
   width: 240px;
   height: 100%;
   box-sizing: border-box;
+  overflow: hidden;
+  transition: width 220ms cubic-bezier(.2,.8,.2,1), padding 180ms ease;
 }
 
 @media (min-width: 900px) {
@@ -17,12 +19,13 @@
     overflow: auto;
     z-index: 60;
     text-align: center;
+    transition: width 220ms cubic-bezier(.2,.8,.2,1), padding 180ms ease;
   }
   main { margin-left: var(--sidebar-width, 240px); }
   .sidebar.collapsed { width: 64px; }
   .sidebar.collapsed ~ main { margin-left: 64px; }
   .sidebar.collapsed .logo-text,
-  .sidebar.collapsed .label { display: none; }
+  .sidebar.collapsed .label { opacity: 0; transform: translateX(-6px); pointer-events: none }
   .sidebar.collapsed .sidebar-logo img { height: 40px !important; }
 }
 
@@ -41,12 +44,13 @@
   font-weight: 500;
   display: block;
   border-radius: 8px;
-  transition: all 300ms ease;
+  transition: background-color 180ms ease, color 180ms ease, transform 160ms ease;
 }
 
 .sidebar-link:hover {
   background-color: rgba(37, 142, 166, 0.1);
   color: var(--paws-accent);
+  transform: translateX(2px);
 }
 .sidebar-header {
   font-size: 1.5rem;
@@ -55,24 +59,24 @@
   display: block;
   border-bottom: 1px solid #e0e0e0;
   margin-bottom: 1rem;
+  position: relative;
 }
 .sidebar-profile { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 0.5rem }
 .profile-link { display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit }
 .profile-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--primary-color),var(--secondary-color)); display:inline-flex; align-items:center; justify-content:center; color:white; font-weight:700 }
-.profile-meta { display:flex; flex-direction:column; align-items:flex-start }
+.profile-meta { display:flex; flex-direction:column; align-items:flex-start; transition: opacity 180ms ease, transform 180ms ease; }
 .profile-name { font-weight:700 }
 .profile-handle { font-size:0.85rem; color:#666 }
 .sidebar-top { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; }
-.collapse-btn { background: transparent; border: none; cursor: pointer; font-size: 1rem; color: var(--paws-accent); }
+.collapse-btn { background: transparent; border: none; cursor: pointer; font-size: 1rem; color: var(--paws-accent); position: absolute; right: 8px; top: 50%; transform: translateY(-50%); z-index: 10; }
 
-/* mobile hamburger */
-.sidebar-hamburger { position: fixed; top: 12px; left: 12px; z-index: 80; display: inline-flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.9); border:1px solid #eee; padding:8px; border-radius:6px; }
+.sidebar-hamburger { position: fixed; top: 12px; left: 12px; z-index: 80; display: none; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.9); border:1px solid #eee; padding:8px; border-radius:6px; }
 .hamburger-line { width: 20px; height: 2px; background: #333; display:block }
 
 /* Drawer styles */
 .sidebar-drawer { position: fixed; inset: 0; z-index: 90; display:flex; }
 .drawer-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
-.drawer-panel { position: relative; width: 260px; background: white; height: 100%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); padding: 1rem; overflow:auto }
+.drawer-panel { position: relative; width: 260px; background: white; height: 100%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); padding: 1rem; overflow:auto; animation: slideIn 220ms cubic-bezier(.2,.8,.2,1) }
 .drawer-header { display:flex; justify-content:flex-end }
 .drawer-list { list-style:none; padding:0; margin:1rem 0 }
 .drawer-link { display:block; padding: 0.75rem 0; border-bottom: 1px solid #f1f1f1 }
@@ -94,6 +98,33 @@
   .sidebar { display: none; }
   .sidebar-hamburger { display: inline-flex }
 }
+
+/* Drawer slide-in animation */
+@keyframes slideIn {
+  from { transform: translateX(-12px); opacity: 0 }
+  to { transform: translateX(0); opacity: 1 }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1 }
+  to { transform: translateX(-12px); opacity: 0 }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1 }
+  to { opacity: 0 }
+}
+
+/* Use stateful classes so we can animate both enter and exit */
+.sidebar-drawer.drawer-enter .drawer-panel { animation: slideIn 220ms cubic-bezier(.2,.8,.2,1) }
+.sidebar-drawer.drawer-exit .drawer-panel { animation: slideOut 200ms cubic-bezier(.2,.8,.2,1) }
+.sidebar-drawer.drawer-enter .drawer-backdrop { animation: fadeIn 220ms ease forwards }
+.sidebar-drawer.drawer-exit .drawer-backdrop { animation: fadeOut 180ms ease forwards }
 :root{
   --sidebar-width: 240px;
   --navbar-height: 72px;
@@ -115,7 +146,7 @@
   .sidebar.collapsed { width: 64px; }
   .sidebar.collapsed ~ main { margin-left: 64px; }
   .sidebar.collapsed .logo-text,
-  .sidebar.collapsed .label { display: none; }
+  .sidebar.collapsed .label { opacity: 0; transform: translateX(-6px); pointer-events: none }
   .sidebar.collapsed .sidebar-logo img { height: 40px !important; }
 }
 
@@ -127,14 +158,16 @@
 }
 
 .sidebar-nav li { margin: 0.6rem 0 }
-.sidebar-link { display:flex; align-items:center; gap:12px; padding:8px 10px; border-radius:10px; transition:all 180ms ease; color: var(--primary-color); text-decoration:none }
+.sidebar-link { display:flex; align-items:center; gap:12px; padding:8px 10px; border-radius:10px; transition: background-color 180ms ease, color 180ms ease, transform 140ms ease; color: var(--primary-color); text-decoration:none }
 .sidebar-link .icon { display:inline-flex; width:26px; height:26px; align-items:center; justify-content:center }
 .sidebar-link .icon svg { display:block }
-.sidebar-link .label { font-weight:600 }
+.sidebar-link .label { font-weight:600; transition: opacity 160ms ease, transform 160ms ease }
 .sidebar-link:hover { background: rgba(37,142,166,0.06); color:var(--paws-accent) }
 
-.sidebar.collapsed .profile-meta, .sidebar.collapsed .label { display:none }
-.sidebar.collapsed { width:72px }
+.sidebar.collapsed .profile-meta, .sidebar.collapsed .label { opacity: 0; transform: translateX(-6px); pointer-events: none }
+.sidebar.collapsed .collapse-btn { opacity: 1; pointer-events: auto }
+.sidebar .profile-avatar { z-index: 5 }
+.sidebar.collapsed { width:64px }
 .sidebar.collapsed .profile-avatar { width:40px; height:40px }
 .sidebar-header {
   font-size: 1.5rem;
@@ -145,19 +178,19 @@
   align-items: center;
   border-bottom: 1px solid #e0e0e0;
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .sidebar-top { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; }
-.collapse-btn { background: transparent; border: none; cursor: pointer; font-size: 1rem; color: var(--paws-accent); }
+.collapse-btn { background: transparent; border: none; cursor: pointer; font-size: 1rem; color: var(--paws-accent); position: absolute; right: 8px; top: 50%; transform: translateY(-50%); z-index: 10; }
 
-/* mobile hamburger */
-.sidebar-hamburger { position: fixed; top: 12px; left: 12px; z-index: 80; display: inline-flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.9); border:1px solid #eee; padding:8px; border-radius:6px; }
+.sidebar-hamburger { position: fixed; top: 12px; left: 12px; z-index: 80; display: none; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.9); border:1px solid #eee; padding:8px; border-radius:6px; }
 .hamburger-line { width: 20px; height: 2px; background: #333; display:block }
 
 /* Drawer styles */
 .sidebar-drawer { position: fixed; inset: 0; z-index: 90; display:flex; }
 .drawer-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
-.drawer-panel { position: relative; width: 260px; background: white; height: 100%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); padding: 1rem; overflow:auto }
+.drawer-panel { position: relative; width: 260px; background: white; height: 100%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); padding: 1rem; overflow:auto; animation: slideIn 220ms cubic-bezier(.2,.8,.2,1) }
 .drawer-header { display:flex; justify-content:flex-end }
 .drawer-list { list-style:none; padding:0; margin:1rem 0 }
 .drawer-link { display:block; padding: 0.75rem 0; border-bottom: 1px solid #f1f1f1 }

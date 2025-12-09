@@ -13,6 +13,7 @@ const links = [
 
 export default function Sidebar() {
     const [open, setOpen] = useState(false) // mobile drawer
+    const [drawerMounted, setDrawerMounted] = useState(false)
     const [collapsed, setCollapsed] = useState(false) // desktop collapse
     const [username, setUsername] = useState<string | null>(null)
 
@@ -35,13 +36,30 @@ export default function Sidebar() {
         return () => { mounted = false }
     }, [])
 
+    // Keep the drawer mounted while exit animation plays
+    useEffect(() => {
+        let t: ReturnType<typeof setTimeout> | undefined
+        if (open) {
+            setDrawerMounted(true)
+        } else if (!open && drawerMounted) {
+            // allow exit animation to play (match CSS 220ms)
+            t = setTimeout(() => setDrawerMounted(false), 240)
+        }
+        return () => {
+            if (t) clearTimeout(t)
+        }
+    }, [open, drawerMounted])
+
     return (
         <>
             {/* Hamburger for mobile */}
             <button
                 className="sidebar-hamburger"
                 aria-label="Open menu"
-                onClick={() => setOpen(true)}
+                onClick={() => {
+                    setOpen(true)
+                    setDrawerMounted(true)
+                }}
             >
                 <span className="hamburger-line" />
                 <span className="hamburger-line" />
@@ -109,8 +127,8 @@ export default function Sidebar() {
             </aside>
 
             {/* Mobile drawer overlay */}
-            {open && (
-                <div className="sidebar-drawer" role="dialog" aria-modal="true">
+            {drawerMounted && (
+                <div className={`sidebar-drawer ${open ? 'drawer-enter' : 'drawer-exit'}`} role="dialog" aria-modal="true">
                     <div className="drawer-backdrop" onClick={() => setOpen(false)} />
                     <div className="drawer-panel">
                         <div className="drawer-header">
@@ -129,3 +147,5 @@ export default function Sidebar() {
         </>
     )
 }
+
+// Drawer unmounting handled via effect inside the component to allow exit animation

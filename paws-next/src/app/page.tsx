@@ -1,7 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import Navbar from "../components/navbar/navbar";
-import Sidebar from "../components/sidebar/sidebar";
+import Sidebar from "@/components/app-sidebar";
 import Post, { type EventRow } from "../components/post/post";
 import { supabase } from "@/lib/supabaseClient";
 

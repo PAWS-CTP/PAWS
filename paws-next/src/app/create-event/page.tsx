@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar/navbar";
 import { supabase } from "@/lib/supabaseClient";
 import { CITIES } from "@/lib/cities";
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input, Textarea } from '@/components/ui/input'
 
 const CreateEventPage: React.FC = () => {
   const router = useRouter();
@@ -131,10 +134,13 @@ const CreateEventPage: React.FC = () => {
             Create New Event
           </h1>
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col space-y-4 max-w-lg"
-          >
+          <Card className="max-w-2xl">
+            <form onSubmit={handleSubmit} className="flex flex-col">
+              <CardHeader>
+                <h1 className="text-2xl font-bold text-[#258EA6]">Create New Event</h1>
+              </CardHeader>
+
+              <CardContent>
             {/* Image Preview */}
             {preview ? (
               <img
@@ -158,35 +164,31 @@ const CreateEventPage: React.FC = () => {
             />
 
             {/* Upload Button */}
-            <button
-              type="button"
-              onClick={handleUploadClick}
-              className="bg-[#258EA6] text-white px-4 py-2 rounded-lg hover:bg-[#1f6e85] transition font-medium"
-            >
-              Upload Image
-            </button>
+            <div className="mt-3 mb-4">
+              <Button type="button" onClick={handleUploadClick} className="bg-[var(--primary-color)] text-white hover:brightness-95">
+                Upload Image
+              </Button>
+            </div>
 
             {/* Title */}
-            <input
+            <Input
               type="text"
               placeholder="Event title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#258EA6]"
             />
 
             {/* Description */}
-            <textarea
+            <Textarea
               placeholder="Describe your event..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#258EA6]"
               rows={4}
             />
 
             {/* Location with autocomplete */}
             <div className="relative">
-            <input
+            <Input
               type="text"
               placeholder="Location (city)"
               value={location}
@@ -198,7 +200,6 @@ const CreateEventPage: React.FC = () => {
               onBlur={() => {
                 setTimeout(() => setShowCityDropdown(false), 150);
               }}
-              className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#258EA6]"
             />
 
             {showCityDropdown && filteredCities.length > 0 && (
@@ -223,36 +224,21 @@ const CreateEventPage: React.FC = () => {
             <div className="flex gap-4 flex-wrap">
               <div className="flex-1 min-w-[120px]">
                 <label className="block text-sm font-medium mb-1">Date</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#258EA6]"
-                />
+                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
 
               <div className="flex-1 min-w-[120px]">
                 <label className="block text-sm font-medium mb-1">
                   Start Time
                 </label>
-                <input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#258EA6]"
-                />
+                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
               </div>
 
               <div className="flex-1 min-w-[120px]">
                 <label className="block text-sm font-medium mb-1">
                   End Time
                 </label>
-                <input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#258EA6]"
-                />
+                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
               </div>
             </div>
 
@@ -273,15 +259,24 @@ const CreateEventPage: React.FC = () => {
               </p>
             )}
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-[#258EA6] text-white py-2 rounded-lg font-semibold hover:bg-[#1f6e85] transition disabled:opacity-60"
-            >
-              {loading ? "Creating..." : "Create Event"}
-            </button>
-          </form>
+              </CardContent>
+
+              <CardFooter>
+                {/* Error message */}
+                {error && (
+                  <p className="text-red-500 text-sm mr-4">
+                    {error}
+                  </p>
+                )}
+
+                <div className="ml-auto">
+                  <Button type="submit" disabled={loading} className="bg-[var(--primary-color)] text-white py-2 rounded-lg font-semibold hover:brightness-95 disabled:opacity-60">
+                    {loading ? "Creating..." : "Create Event"}
+                  </Button>
+                </div>
+              </CardFooter>
+            </form>
+          </Card>
         </main>
       </div>
     </div>
