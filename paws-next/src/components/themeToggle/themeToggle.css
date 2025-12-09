@@ -19,12 +19,6 @@
 
 .floating-theme-toggle:hover { transform: translateY(-3px); }
 
-[data-theme="dark"] .floating-theme-toggle {
-  background: rgba(255,255,255,0.03);
-  color: var(--text-secondary);
-  border-color: rgba(255,255,255,0.06);
-}
-
 @media (max-width: 640px) {
   .floating-theme-toggle { right: 14px; bottom: 14px; width: 44px; height: 44px; }
 }

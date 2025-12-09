@@ -122,7 +122,7 @@
   padding: 0.25rem 0.6rem;
   font-size: 0.8rem;
   border-radius: 999px;
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   background: white;
   cursor: pointer;
 }
@@ -196,9 +196,4 @@
     z-index: 1200;
 }
 
-.create-post-fab:hover { transform: translateY(-3px); }
-
-@media (max-width: 640px) {
-    .create-post-fab { right: 16px; bottom: 18px; width: 48px; height: 48px; }
-}
 
