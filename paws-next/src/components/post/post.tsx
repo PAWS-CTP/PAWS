@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Comment, { type Comment as CommentType } from "../comment/comment";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
@@ -27,7 +27,6 @@ export type EventRow = {
 type PostProps = {
   event: EventRow;
  // for likes and comments in local state for now
-  initialLikes?: number;
   initialComments?: CommentType[];
 };
 
@@ -50,13 +49,10 @@ const formatTime = (iso?: string | null) => {
 
 export default function Post({ 
   event,
-  initialLikes = 0,
   initialComments = [],
 }: PostProps) {
   // local storage for now
-  // likes – local state + (optionally) synced to DB
-  const [likes, setLikes] = useState(initialLikes);
-    //event.like_count ?? initialLikes ?? 0 ); <- after you add like_count to events
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
 
   // comments local state for now
@@ -77,33 +73,74 @@ export default function Post({
   const start = formatTime(start_time);
   const end = formatTime(end_time);
 
+  useEffect(() => {
+    const fetchLikes = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const userId = session?.user?.id;
+
+      // Fetch total likes
+      const { data: likesData, error: likesError } = await supabase
+        .from("likes")
+        .select("*")
+        .eq("event_id", event.id);
+
+      if (likesError) console.error("Error fetching likes:", likesError);
+      else setLikes(likesData?.length || 0);
+
+      // Check if current user liked
+      if (userId) {
+        const { data: userLike, error: userLikeError } = await supabase
+          .from("likes")
+          .select("*")
+          .eq("event_id", event.id)
+          .eq("user_id", userId)
+          .single();
+
+        if (!userLikeError && userLike) setLiked(true);
+      }
+    };
+
+    fetchLikes();
+  }, [event.id]);
+
   const handleLike = async () => {
-    // optimistic update on the frontend
-    const newLiked = !liked;
-    const newLikes = likes + (newLiked ? 1 : -1);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
 
-    setLiked(newLiked);
-    setLikes(newLikes);
+    if (!userId) {
+      console.log("User not logged in. Cannot like the post.");
+      return;
+    }
 
-    // 🔁 LATER: save to DB (events.like_count)
-  //   try {
-  //     const { error } = await supabase
-  //       .from("events")
-  //       .update({ like_count: newLikes })
-  //       .eq("id", event.id);
-
-  //     if (error) {
-  //       console.error("Failed to update like_count:", error);
-  //       // revert if DB update fails
-  //       setLiked(!newLiked);
-  //       setLikes(likes);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error updating likes:", err);
-  //     setLiked(!newLiked);
-  //     setLikes(likes);
-  //   }
-   };
+    if (!liked) {
+      // Insert like
+      const { error } = await supabase.from("likes").insert([
+        { user_id: userId, event_id: event.id },
+      ]);
+      if (error) console.error("Failed to add like:", error);
+      else {
+        setLiked(true);
+        setLikes((prev) => prev + 1);
+      }
+    } else {
+      // Remove like
+      const { error } = await supabase
+        .from("likes")
+        .delete()
+        .eq("user_id", userId)
+        .eq("event_id", event.id);
+      if (error) console.error("Failed to remove like:", error);
+      else {
+        setLiked(false);
+        setLikes((prev) => (prev > 0 ? prev - 1 : 0));
+      }
+    }
+  };
 
     const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +219,7 @@ export default function Post({
       </CardFooter>
     </Card>
   );
-}
+  }
 
 /**
  * 🔁 LATER CHANGES:
