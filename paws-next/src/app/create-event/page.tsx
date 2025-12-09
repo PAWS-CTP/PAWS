@@ -142,7 +142,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       throw new Error(insertError.message || "Failed to create event.");
     }
 
-    alert("Event created successfully!");
+    // alert("Event created successfully!");
     router.push("/");
   } catch (err: any) {
     console.error(err);
