@@ -14,7 +14,7 @@ export default function ProfilePost({ id, imageUrl }: Props) {
     <Card className="p-0 overflow-hidden rounded-lg cursor-pointer">
       <Link href={`/post/${id}`}>
         <div className="relative w-full aspect-square overflow-hidden bg-gray-100">
-          <img src={src} className="w-full h-full object-cover object-center" alt={`post-${id}`} />
+          <img src={imageUrl} className="w-full h-full object-cover object-center" alt={`post-${id}`} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-flex" />
         </div>
       </Link>
