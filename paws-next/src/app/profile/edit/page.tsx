@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react'
 import supabase from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input, Textarea } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export default function EditProfilePage() {
   const [username, setUsername] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
   const [bio, setBio] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -55,11 +57,8 @@ export default function EditProfilePage() {
       }
 
       const updates = { username, bio }
-      // Use onConflict to target the `id` column explicitly. This helps avoid duplicate-key
-      // errors on other unique columns (like email) when the row for this id already exists.
       const { error } = await supabase.from('users').upsert({ id: userId, ...updates }, { onConflict: 'id' })
       if (error) {
-        // Handle duplicate-email unique constraint with a clearer message
         if (error.code === '23505' || /duplicate key value/.test(error.message || '')) {
           setError('A user with this email already exists. Please use a different email.')
         } else {
@@ -78,26 +77,34 @@ export default function EditProfilePage() {
 
   return (
     <div style={{ paddingTop: 'var(--navbar-height,72px)' }} className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-md p-6">
-        <h2 className="text-2xl font-semibold mb-4">Edit Profile</h2>
-        <form onSubmit={saveProfile} className="flex flex-col gap-3 bg-white p-4 rounded shadow">
-          <label className="text-sm">Username</label>
-          <input value={username} onChange={(e) => setUsername(e.target.value)} className="border p-2 rounded" />
+      <div className="w-full max-w-lg p-6">
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-[var(--primary-color)]">Edit Profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={saveProfile} className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm mb-1 block text-[var(--text-secondary)]">Username</label>
+                <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+              </div>
 
-          <label className="text-sm">Avatar URL</label>
-          <input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} className="border p-2 rounded" />
+              {/* Avatar URL removed per request */}
 
-          <label className="text-sm">Bio</label>
-          <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="border p-2 rounded" />
+              <div>
+                <label className="text-sm mb-1 block text-[var(--text-secondary)]">Bio</label>
+                <Textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+              </div>
 
-          {error && <div className="text-red-500">{error}</div>}
-          <div className="flex justify-between">
-            <button type="button" onClick={() => router.push('/profile')} className="bg-gray-200 text-gray-800 py-2 px-4 rounded">Cancel</button>
-            <div>
-              <button type="submit" disabled={loading} className="bg-blue-500 text-white py-2 px-4 rounded">{loading ? 'Saving…' : 'Save'}</button>
-            </div>
-          </div>
-        </form>
+              {error && <div className="text-red-500">{error}</div>}
+
+              <div className="flex justify-between">
+                <Button variant="outline" className="border-[1px] border-[color:var(--primary-color)/0.18] text-[var(--primary-color)]" onClick={() => router.push('/profile')}>Cancel</Button>
+                <Button type="submit" disabled={loading} className="bg-[var(--primary-color)] text-white hover:brightness-95">{loading ? 'Saving…' : 'Save'}</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

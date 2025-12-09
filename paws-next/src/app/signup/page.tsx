@@ -3,57 +3,68 @@
 import React, { useState } from 'react'
 import supabase from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import pawsLogo from '@/assets/PAWS_Logo_NoText.png'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import GoogleIcon from '@/components/icons/Google'
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+
+  async function handleGoogleSignUp() {
+    try {
+      setLoading(true)
+      const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined
+      await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
+    } catch (err) {
+      console.error(err)
+      setLoading(false)
+    }
+  }
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    if (!email || !password) {
-      setError('Please provide email and password')
+    if (!username || !email || !password) {
+      setError('Please enter an email and password')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
       return
     }
     setLoading(true)
     try {
       const { data, error: signErr } = await supabase.auth.signUp({ email, password } as any)
-      if (signErr) {
-        setError(signErr.message)
-        return
-      }
-
-      const userId = (data as any)?.user?.id || (data as any)?.session?.user?.id
-
-      if (data && (data as any).session) {
-        // Signed in immediately (no email confirmation required) — upsert profile
-        if (username && userId) {
-          await supabase.from('users').upsert({ id: userId, username })
-        }
-        // Show success and redirect to feed
-        setMessage('Account created successfully.')
-        setSuccess(true)
-        setTimeout(() => router.push('/'), 1200)
-        return
-      }
-
-      // No session returned: most likely email confirmation is required.
-      // Inform the user (no automatic redirect).
-      setMessage('Account created — please check your email to confirm.')
-      setSuccess(true)
-      setTimeout(() => router.push('/'), 2200)
-    } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.error(err)
-      setError(err?.message ?? 'Sign up failed')
-    } finally {
       setLoading(false)
+      if (signErr) {
+        setError(signErr.message || 'Sign up failed')
+        return
+      }
+
+      // If Supabase returned a user id, upsert the public `users` table with the username
+      const userId = data?.user?.id
+      if (userId) {
+        const { error: upsertErr } = await supabase.from('users').upsert({ id: userId, email, username })
+        if (upsertErr) {
+          // Log but don't block the flow — keep original auth behavior intact
+          console.warn('Failed to upsert users table:', upsertErr)
+        }
+      }
+
+      // After sign up, Supabase may require email confirmation — redirect to home or welcome page
+      router.push('/')
+    } catch (err: any) {
+      setLoading(false)
+      setError(err?.message || 'Sign up failed')
     }
   }
 
@@ -62,29 +73,111 @@ export default function SignUpPage() {
       className="min-h-screen flex items-center justify-center"
       style={{ background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))' }}
     >
-      <div className="flex flex-col items-center">
-        <div className="bg-white p-8 rounded-lg shadow-sm w-80 text-center">
-          <h2 className="text-2xl font-semibold mb-4">Create an account</h2>
-          <form onSubmit={handleSignUp} className="flex flex-col gap-3">
-          <input className="border p-2 rounded" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input className="border p-2 rounded" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-          <input className="border p-2 rounded" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          {error && <div className="text-red-500 text-sm">{error}</div>}
-          <button disabled={loading} className="text-white px-4 py-2 rounded w-full mt-1" style={{ background: 'var(--primary-color)' }}>{loading ? 'Creating…' : 'Sign Up'}</button>
-          {message && (
-            <div className="flex items-center justify-center gap-2 mt-2">
-              {success && <div className="border-4 border-gray-200 border-t-blue-500 rounded-full w-5 h-5 animate-spin" role="status" aria-label="loading"></div>}
-              <div className="text-sm text-green-600">{message}</div>
-            </div>
-          )}
-          </form>
+      <div className="w-full max-w-4xl rounded-xl overflow-hidden shadow-lg grid md:grid-cols-2 min-h-[560px]">
+        {/* Left: sign up form */}
+        <div className="bg-[#0f1724] text-white p-10">
+          <div className="max-w-md mx-auto">
+            <h2 className="text-2xl font-semibold mb-1">Create your account</h2>
+            <p className="text-sm text-slate-400 mb-6">Join PAWS to share pets and events with your community</p>
+
+            <form onSubmit={handleSignUp} className="space-y-4">
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Username</label>
+                <Input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter a username"
+                  className="bg-slate-800 border-slate-700 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Email</label>
+                <Input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="bg-slate-800 border-slate-700 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Password</label>
+                <div className="relative">
+                  <Input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Create a password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="bg-slate-800 border-slate-700 text-white pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 px-2 py-1 rounded"
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Confirm password</label>
+                <div className="relative">
+                  <Input
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="bg-slate-800 border-slate-700 text-white pr-12"
+                  />
+                </div>
+              </div>
+
+              {error && <div className="text-sm text-red-400">{error}</div>}
+
+              <Button type="submit" className="w-full" style={{ background: 'var(--primary-color)' }}>
+                {loading ? 'Creating account…' : 'Create account'}
+              </Button>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-slate-700" />
+                <div className="text-xs text-slate-400">Or sign up with</div>
+                <div className="flex-1 h-px bg-slate-700" />
+              </div>
+
+              <div className="flex gap-3 mt-2">
+                <Button
+                  onClick={handleGoogleSignUp}
+                  className="w-full flex items-center justify-center gap-2 bg-[var(--secondary-color)] text-white hover:brightness-95"
+                >
+                  <GoogleIcon className="w-4 h-4" />
+                  Sign up with Google
+                </Button>
+              </div>
+
+              <div className="text-center text-xs text-slate-400 mt-4">
+                Already have an account? <a href="/signin" className="text-white underline">Sign in</a>
+              </div>
+            </form>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm w-80 text-center mt-4">
-          <div className="text-sm">
-            Already have an account? <a href="/signin" className="text-blue-500">Sign in</a>
+
+        {/* Right: large PAWS image */}
+        <div className="relative flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full overflow-hidden">
+            <Image
+              src={pawsLogo}
+              alt="PAWS"
+              fill
+              className="object-cover transform scale-125"
+              style={{ transformOrigin: 'center' }}
+            />
           </div>
         </div>
       </div>
     </div>
   )
 }
+ 

@@ -5,6 +5,9 @@ import supabase from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import pawsLogo from '@/assets/PAWS_Logo_NoText.png'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import GoogleIcon from '@/components/icons/Google'
 
 export default function SignInPage() {
   const [loading, setLoading] = useState(false)
@@ -16,36 +19,14 @@ export default function SignInPage() {
   async function handleGoogleSignIn() {
     try {
       setLoading(true)
-      // Request Supabase to redirect back to the feed after the OAuth flow completes.
-      // Must match an entry in Supabase Auth -> Settings -> Redirect URLs.
       const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined
-      // Log redirect target to help debug redirect / allowed URL issues
-      // eslint-disable-next-line no-console
-      console.debug('Starting Google OAuth, redirectTo=', redirectTo)
-
-      const result = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
-      // eslint-disable-next-line no-console
-      console.debug('supabase.auth.signInWithOAuth result:', result)
-
-      // In many cases Supabase will immediately redirect the browser to Google.
-      // If an error is returned immediately, surface it to the user and stop loading.
-      if ((result as any).error) {
-        // eslint-disable-next-line no-console
-        console.warn('OAuth signIn error', (result as any).error)
-        alert((result as any).error.message || 'OAuth sign in failed')
-        setLoading(false)
-        return
-      }
-      // Supabase will redirect to Google; when the flow completes it will return to your configured redirect URL
+      await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err)
-      alert('Sign in failed')
       setLoading(false)
     }
   }
 
-  // If user already has a session (returned from Supabase after OAuth), send them to feed.
   React.useEffect(() => {
     let mounted = true
     ;(async () => {
@@ -73,24 +54,15 @@ export default function SignInPage() {
     }
     setLoading(true)
     try {
-      // Assumes `username` is an email. If you allow usernames, resolve to email server-side.
-      const { data, error: signErr } = await supabase.auth.signInWithPassword({
-        email: username,
-        password,
-      } as any)
-
+      const { error: signErr } = await supabase.auth.signInWithPassword({ email: username, password } as any)
       setLoading(false)
-
       if (signErr) {
         setError(signErr.message || 'Sign in failed')
         return
       }
-
-      // Signed in successfully — redirect to feed
       router.push('/')
     } catch (err: any) {
       setLoading(false)
-      // If the client was not properly configured, the stub may throw.
       const msg = err?.message || 'Sign in failed'
       setError(msg)
     }
@@ -99,61 +71,79 @@ export default function SignInPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{
-        background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))',
-      }}
+      style={{ background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))' }}
     >
-      <div className="flex flex-col items-center">
-        <div className="bg-white p-8 rounded-lg shadow-sm w-80 text-center">
-          <div className="mb-4">
-            <Image src={pawsLogo} alt="PAWS" width={160} height={80} className="mx-auto" />
-          </div>
-          <p className="text-gray-500 text-sm mb-4">Sign in to see photos and updates from your friends.</p>
+      <div className="w-full max-w-4xl rounded-xl overflow-hidden shadow-lg grid md:grid-cols-2 min-h-[520px]">
+        {/* Left: form */}
+        <div className="bg-[#0f1724] text-white p-10">
+          <div className="max-w-md mx-auto">
+            <h2 className="text-2xl font-semibold mb-1">Welcome back</h2>
+            <p className="text-sm text-slate-400 mb-6">Login to your PAWS account</p>
 
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="text-white px-4 py-2 rounded w-full mb-3"
-            style={{ background: 'var(--primary-color)' }}
-          >
-            {loading ? 'Redirecting…' : 'Continue with Google'}
-          </button>
+            <form onSubmit={handlePasswordSignIn} className="space-y-4">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Email</label>
+                <Input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="m@example.com"
+                  className="bg-slate-800 border-slate-700 text-white"
+                />
+              </div>
 
-          <div className="flex items-center my-3">
-            <div className="flex-1 h-px bg-gray-200" />
-            <div className="px-3 text-sm text-gray-400">OR</div>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs text-slate-400 mb-1">Password</label>
+                  <a className="text-xs text-slate-400">Forgot your password?</a>
+                </div>
+                <Input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder=""
+                  type="password"
+                  className="bg-slate-800 border-slate-700 text-white"
+                />
+              </div>
 
-          <form onSubmit={handlePasswordSignIn} className="flex flex-col gap-2">
-            <input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Email or username"
-              className="border p-2 rounded text-sm"
-            />
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              type="password"
-              className="border p-2 rounded text-sm"
-            />
-            {error && <div className="text-red-500 text-sm">{error}</div>}
-            <button type="submit" disabled={loading} className="mt-1 text-white py-2 rounded text-sm"
-              style={{ background: 'var(--primary-color)' }}>
-              {loading ? 'Signing in…' : 'Sign In'}
-            </button>
-          </form>
+              {error && <div className="text-sm text-red-400">{error}</div>}
 
-          <div className="mt-3 text-xs text-gray-500">
-            <a href="#" className="text-blue-500">Forgot password?</a>
+              <Button type="submit" className="w-full" style={{ background: 'var(--primary-color)' }}>
+                {loading ? 'Signing in…' : 'Login'}
+              </Button>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-slate-700" />
+                <div className="text-xs text-slate-400">Or continue with</div>
+                <div className="flex-1 h-px bg-slate-700" />
+              </div>
+
+              <div className="flex gap-3 mt-2">
+                <Button
+                  onClick={handleGoogleSignIn}
+                  className="w-full flex items-center justify-center gap-2 bg-[var(--secondary-color)] text-white hover:brightness-95"
+                >
+                  <GoogleIcon className="w-4 h-4" />
+                  Continue with Google
+                </Button>
+              </div>
+
+              <div className="text-center text-xs text-slate-400 mt-4">
+                Don't have an account? <a href="/signup" className="text-white underline">Sign up</a>
+              </div>
+            </form>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm w-80 text-center mt-4">
-          <div className="text-sm">
-            Don't have an account? <a href="/signup" className="text-blue-500 font-medium">Sign up here</a>
+        {/* Right: image (overflow-hidden and scaled to crop any white padding inside SVG) */}
+        <div className="relative flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full overflow-hidden">
+            <Image
+              src={pawsLogo}
+              alt="PAWS"
+              fill
+              className="object-cover transform scale-125"
+              style={{ transformOrigin: 'center' }}
+            />
           </div>
         </div>
       </div>

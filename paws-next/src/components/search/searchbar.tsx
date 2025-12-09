@@ -71,7 +71,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           />
         </div>
 
-        <button type="submit" className="hidden md:inline-flex items-center px-3 py-1 rounded-md bg-teal-600 text-white text-sm hover:bg-teal-700">Search</button>
+        <button
+          type="submit"
+          className="hidden md:inline-flex items-center px-3 py-1 rounded-md bg-[var(--primary-color)] text-white text-sm hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[color:var(--primary-color)/0.45]"
+        >
+          Search
+        </button>
       </div>
 
       {open && suggestions.length > 0 && (

@@ -69,7 +69,10 @@ export default function ProfileHeader() {
               {avatar ? (
                 <img src={avatar} alt={`${username} avatar`} className="w-28 h-28 rounded-full object-cover shadow-md" />
               ) : (
-                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-white flex items-center justify-center text-3xl font-bold shadow-md">
+                <div
+                  className="w-28 h-28 rounded-full text-white flex items-center justify-center text-3xl font-bold shadow-md"
+                  style={{ background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))' }}
+                >
                   {username ? username.charAt(0).toUpperCase() : 'Y'}
                 </div>
               )}
@@ -85,7 +88,7 @@ export default function ProfileHeader() {
 
           <div className="flex items-start">
             <Link href="/profile/edit">
-              <Button variant="primary" className="py-2 px-3 inline-flex items-center gap-2">
+              <Button className="py-2 px-3 inline-flex items-center gap-2 bg-[var(--primary-color)] text-white hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[color:var(--primary-color)/0.45]">
                 <Edit size={16} />
                 Edit Profile
               </Button>

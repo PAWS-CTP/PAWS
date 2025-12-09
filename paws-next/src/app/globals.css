@@ -5,7 +5,7 @@
 
 :root {
   --primary-color: #258EA6;
-  --secondary-color: #EC22FF;
+  --secondary-color: #C017D4;
   --sidebar-width: 50px;
   --text-color-accent: #549f93;
 
@@ -144,4 +144,22 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Like button pulse animation */
+.like-pulse {
+  animation: likePulse 320ms ease;
+}
+
+@keyframes likePulse {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.18); filter: brightness(1.2); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* Scoped hover override: use secondary color for buttons inside feed/profile */
+.feed-page [data-slot="button"]:hover,
+.profile-page [data-slot="button"]:hover {
+  background-color: var(--secondary-color) !important;
+  color: var(--secondary-foreground) !important;
 }

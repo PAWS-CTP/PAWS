@@ -134,145 +134,145 @@ const CreateEventPage: React.FC = () => {
             Create New Event
           </h1>
 
-          <Card className="max-w-2xl">
+          <Card className="max-w-2xl mx-auto">
             <form onSubmit={handleSubmit} className="flex flex-col">
               <CardHeader>
                 <h1 className="text-2xl font-bold text-[#258EA6]">Create New Event</h1>
               </CardHeader>
 
               <CardContent>
-            {/* Image Preview */}
-            {preview ? (
-              <img
-                src={preview}
-                alt="Preview"
-                className="rounded-lg border border-gray-300 object-cover max-w-full"
-              />
-            ) : (
-              <div className="flex items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg text-gray-400">
-                No image selected
-              </div>
-            )}
+                <div className="space-y-4">
+                  {/* Image Preview */}
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="rounded-lg border border-gray-300 object-cover max-w-full h-48 w-full"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg text-gray-400">
+                      No image selected
+                    </div>
+                  )}
 
-            {/* Hidden File Input */}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-              className="hidden"
-            />
+                  {/* Hidden File Input */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
 
-            {/* Upload Button */}
-            <div className="mt-3 mb-4">
-              <Button type="button" onClick={handleUploadClick} className="bg-[var(--primary-color)] text-white hover:brightness-95">
-                Upload Image
-              </Button>
-            </div>
+                  {/* Upload Button */}
+                  <div>
+                    <Button type="button" onClick={handleUploadClick} className="bg-[var(--primary-color)] text-white hover:brightness-95">
+                      Upload Image
+                    </Button>
+                  </div>
 
-            {/* Title */}
-            <Input
-              type="text"
-              placeholder="Event title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+                  {/* Title */}
+                  <div>
+                    <label className="text-sm mb-1 block">Title</label>
+                    <Input
+                      type="text"
+                      placeholder="Event title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </div>
 
-            {/* Description */}
-            <Textarea
-              placeholder="Describe your event..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-            />
+                  {/* Description */}
+                  <div>
+                    <label className="text-sm mb-1 block">Description</label>
+                    <Textarea
+                      placeholder="Describe your event..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
 
-            {/* Location with autocomplete */}
-            <div className="relative">
-            <Input
-              type="text"
-              placeholder="Location (city)"
-              value={location}
-              onChange={(e) => {
-                setLocation(e.target.value);
-                setShowCityDropdown(true);
-              }}
-              onFocus={() => setShowCityDropdown(true)}
-              onBlur={() => {
-                setTimeout(() => setShowCityDropdown(false), 150);
-              }}
-            />
+                  {/* Location with autocomplete */}
+                  <div className="relative">
+                    <label className="text-sm mb-1 block">Location</label>
+                    <Input
+                      type="text"
+                      placeholder="Location (city)"
+                      value={location}
+                      onChange={(e) => {
+                        setLocation(e.target.value);
+                        setShowCityDropdown(true);
+                      }}
+                      onFocus={() => setShowCityDropdown(true)}
+                      onBlur={() => {
+                        setTimeout(() => setShowCityDropdown(false), 150);
+                      }}
+                    />
 
-            {showCityDropdown && filteredCities.length > 0 && (
-              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow">
-                {filteredCities.map((city) => (
-                  <li
-                    key={city}
-                    onMouseDown={() => {
-                      setLocation(city);
-                      setShowCityDropdown(false);
-                    }}
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-sm"
-                  >
-                    {city}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+                    {showCityDropdown && filteredCities.length > 0 && (
+                      <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow">
+                        {filteredCities.map((city) => (
+                          <li
+                            key={city}
+                            onMouseDown={() => {
+                              setLocation(city);
+                              setShowCityDropdown(false);
+                            }}
+                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-sm"
+                          >
+                            {city}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
 
-            {/* Date + Times */}
-            <div className="flex gap-4 flex-wrap">
-              <div className="flex-1 min-w-[120px]">
-                <label className="block text-sm font-medium mb-1">Date</label>
-                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-              </div>
+                  {/* Date + Times */}
+                  <div className="flex gap-4 flex-wrap">
+                    <div className="flex-1 min-w-[120px]">
+                      <label className="block text-sm font-medium mb-1">Date</label>
+                      <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                    </div>
 
-              <div className="flex-1 min-w-[120px]">
-                <label className="block text-sm font-medium mb-1">
-                  Start Time
-                </label>
-                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-              </div>
+                    <div className="flex-1 min-w-[120px]">
+                      <label className="block text-sm font-medium mb-1">Start Time</label>
+                      <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                    </div>
 
-              <div className="flex-1 min-w-[120px]">
-                <label className="block text-sm font-medium mb-1">
-                  End Time
-                </label>
-                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-              </div>
-            </div>
+                    <div className="flex-1 min-w-[120px]">
+                      <label className="block text-sm font-medium mb-1">End Time</label>
+                      <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+                    </div>
+                  </div>
 
-            {/* Privacy */}
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={isPrivate}
-                onChange={(e) => setIsPrivate(e.target.checked)}
-              />
-              Make this event private
-            </label>
+                  {/* Privacy */}
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={isPrivate}
+                      onChange={(e) => setIsPrivate(e.target.checked)}
+                    />
+                    Make this event private
+                  </label>
 
-            {/* Error message */}
-            {error && (
-              <p className="text-red-500 text-sm">
-                {error}
-              </p>
-            )}
-
+                </div>
               </CardContent>
 
               <CardFooter>
-                {/* Error message */}
-                {error && (
-                  <p className="text-red-500 text-sm mr-4">
-                    {error}
-                  </p>
-                )}
+                <div className="flex items-center gap-4 w-full">
+                  {/* Error message */}
+                  {error && (
+                    <p className="text-red-500 text-sm">
+                      {error}
+                    </p>
+                  )}
 
-                <div className="ml-auto">
-                  <Button type="submit" disabled={loading} className="bg-[var(--primary-color)] text-white py-2 rounded-lg font-semibold hover:brightness-95 disabled:opacity-60">
-                    {loading ? "Creating..." : "Create Event"}
-                  </Button>
+                  <div className="ml-auto">
+                    <Button type="submit" disabled={loading} className="bg-[var(--primary-color)] text-white py-2 rounded-lg font-semibold hover:brightness-95 disabled:opacity-60">
+                      {loading ? "Creating..." : "Create Event"}
+                    </Button>
+                  </div>
                 </div>
               </CardFooter>
             </form>

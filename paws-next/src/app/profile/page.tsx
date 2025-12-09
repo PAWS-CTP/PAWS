@@ -17,11 +17,17 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div className="bg-gray-50" style={{ paddingTop: 'var(--navbar-height,72px)' }}>
+      <div className="bg-white profile-page" style={{ paddingTop: 'var(--navbar-height,72px)' }}>
         <div className="flex justify-center">
           <div className="w-full max-w-5xl px-4">
             <div className="py-10">
               <ProfileHeader />
+            </div>
+
+            <div className="mt-4 px-4">
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-semibold text-slate-700">Posts</h3>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-4">

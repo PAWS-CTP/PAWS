@@ -5,7 +5,7 @@ import Comment, { type Comment as CommentType } from "../comment/comment";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Heart, MessageSquare } from 'lucide-react'
+import PawIcon from '@/components/icons/Paw'
 /**
  * Current shape of the `events` table.
  * Update this later if you add more columns (user_id, like_count, etc.).
@@ -54,6 +54,7 @@ export default function Post({
   // local storage for now
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
+  const [pulsing, setPulsing] = useState(false);
 
   // comments local state for now
   const [comments, setComments] = useState<CommentType[]>(initialComments);
@@ -117,6 +118,10 @@ export default function Post({
       return;
     }
 
+    // trigger a short pulse animation for feedback
+    setPulsing(true);
+    setTimeout(() => setPulsing(false), 360);
+
     if (!liked) {
       // Insert like
       const { error } = await supabase.from("likes").insert([
@@ -160,7 +165,7 @@ export default function Post({
   };
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 max-w-lg mx-auto">
       <CardHeader>
         <div className="flex items-start justify-between w-full">
           <div>
@@ -174,47 +179,59 @@ export default function Post({
         </div>
       </CardHeader>
 
+
       <CardContent>
         {img_url && (
           <div className="w-full rounded overflow-hidden mb-4">
-            <img src={img_url} alt={title || "Event image"} className="w-full h-80 object-cover" />
+            <div className="w-full overflow-hidden aspect-[4/5] rounded-lg">
+              <img
+                src={img_url}
+                alt={title || "Event image"}
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
           </div>
         )}
+
+        <div className="mb-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLike}
+            className="inline-flex items-center gap-2 px-0"
+          >
+            <PawIcon className={`w-6 h-6 ${pulsing ? 'like-pulse' : ''} ${liked ? 'text-red-500' : 'text-gray-500'}`} />
+            <span>{likes}</span>
+          </Button>
+        </div>
 
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </CardContent>
 
       <CardFooter>
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={handleLike} className="inline-flex items-center gap-2">
-            <Heart className={`transition ${liked ? 'text-red-500' : 'text-gray-500'}`} />
-            <span>{likes}</span>
-          </Button>
-
-          <div className="flex-1">
-            <div className="space-y-3">
-              {comments.map((comment) => (
-                <Comment key={comment.id} {...comment} />
-              ))}
-            </div>
-
-            <form className="mt-3 flex gap-2" onSubmit={handleAddComment}>
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 rounded-md border px-3 py-2 text-sm"
-              />
-              <Button
-                size="sm"
-                type="submit"
-                className="bg-[var(--primary-color)] text-white hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[color:var(--primary-color)/0.45] active:scale-95 transition-transform"
-              >
-                Post
-              </Button>
-            </form>
+        <div className="flex-1 w-full">
+          <div className="space-y-3 w-full">
+            {comments.map((comment) => (
+              <Comment key={comment.id} {...comment} />
+            ))}
           </div>
+
+          <form className="mt-3 flex gap-2" onSubmit={handleAddComment}>
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 rounded-md border px-3 py-2 text-sm"
+            />
+            <Button
+              size="sm"
+              type="submit"
+              className="bg-[var(--primary-color)] text-white hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[color:var(--primary-color)/0.45] active:scale-95 transition-transform"
+            >
+              Post
+            </Button>
+          </form>
         </div>
       </CardFooter>
     </Card>
