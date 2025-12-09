@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar/navbar";
 import { supabase } from "@/lib/supabaseClient";
 import { CITIES } from "@/lib/cities";
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input, Textarea } from '@/components/ui/input'
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input, Textarea } from "@/components/ui/input";
 
 const CreateEventPage: React.FC = () => {
   const router = useRouter();
@@ -33,8 +33,8 @@ const CreateEventPage: React.FC = () => {
   // for location dropdown
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const filteredCities = CITIES.filter((city) =>
-  city.toLowerCase().includes(location.toLowerCase())
-);
+    city.toLowerCase().includes(location.toLowerCase())
+  );
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -49,108 +49,108 @@ const CreateEventPage: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-  // basic validation
-  if (!title || !location || !date || !startTime || !endTime) {
-    setError("Please fill out title, location, date, start time, and end time.");
-    return;
-  }
-  if (!image) {
-    setError("Please upload an image before creating the event.");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    // 0) get current logged-in user so we can look up their username
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-
-    if (sessionError) {
-      console.error("Session error:", sessionError);
-      throw new Error("Could not get current session.");
+    // basic validation
+    if (!title || !location || !date || !startTime || !endTime) {
+      setError("Please fill out title, location, date, start time, and end time.");
+      return;
+    }
+    if (!image) {
+      setError("Please upload an image before creating the event.");
+      return;
     }
 
-    const userId = session?.user?.id;
-    if (!userId) {
-      throw new Error("You must be signed in to create an event.");
+    setLoading(true);
+
+    try {
+      // 0) get current logged-in user (needed for user_id + username)
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        throw new Error("Could not get current session.");
+      }
+
+      const userId = session?.user?.id;
+      if (!userId) {
+        throw new Error("You must be signed in to create an event.");
+      }
+
+      // look up username from your `users` table
+      let creatorUsername: string | null = null;
+      const { data: userRow, error: userError } = await supabase
+        .from("users")
+        .select("username")
+        .eq("id", userId)
+        .single();
+
+      if (userError) {
+        console.warn("Could not load username for event:", userError);
+      } else {
+        creatorUsername = userRow?.username ?? null;
+      }
+
+      // 1) upload image to Supabase Storage
+      const fileExt = image.name.split(".").pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `events/${fileName}`;
+      const BUCKET = "event_images";
+
+      const { error: uploadError } = await supabase.storage
+        .from(BUCKET)
+        .upload(filePath, image, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        throw new Error(uploadError.message || "Failed to upload image.");
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
+
+      // 2) build ISO datetimes
+      const startDateTime = new Date(`${date}T${startTime}:00`);
+      const endDateTime = new Date(`${date}T${endTime}:00`);
+
+      // 3) insert event row into Supabase, including user_id + username
+      const { error: insertError } = await supabase.from("events").insert([
+        {
+          title,
+          description,
+          location,
+          date,
+          start_time: startDateTime.toISOString(),
+          end_time: endDateTime.toISOString(),
+          img_url: publicUrl,
+          privacy: isPrivate,
+          user_id: userId,          // 🔴 needed for RLS
+          username: creatorUsername // for display in feed
+        },
+      ]);
+
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        throw new Error(insertError.message || "Failed to create event.");
+      }
+
+      router.push("/");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Something went wrong creating the event.");
+    } finally {
+      setLoading(false);
     }
-
-    // find username from your `users` table
-    let creatorUsername: string | null = null;
-    const { data: userRow, error: userError } = await supabase
-      .from("users")
-      .select("username")
-      .eq("id", userId)
-      .single();
-
-    if (userError) {
-      console.warn("Could not load username for event:", userError);
-    } else {
-      creatorUsername = userRow?.username ?? null;
-    }
-
-    // 1) upload image to Supabase Storage
-    const fileExt = image.name.split(".").pop();
-    const fileName = `${crypto.randomUUID()}.${fileExt}`;
-    const filePath = `events/${fileName}`;
-    const BUCKET = "event_images";
-
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(filePath, image, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    if (uploadError) {
-      console.error("Upload error:", uploadError);
-      throw new Error(uploadError.message || "Failed to upload image.");
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-
-    // 2) build ISO datetimes
-    const startDateTime = new Date(`${date}T${startTime}:00`);
-    const endDateTime = new Date(`${date}T${endTime}:00`);
-
-    // 3) insert event row into Supabase, including username
-    const { error: insertError } = await supabase.from("events").insert([
-      {
-        title,
-        description,
-        location,
-        date,
-        start_time: startDateTime.toISOString(),
-        end_time: endDateTime.toISOString(),
-        img_url: publicUrl,
-        privacy: isPrivate,
-        username: creatorUsername, // this populates your events.username column
-      },
-    ]);
-
-    if (insertError) {
-      console.error("Insert error:", insertError);
-      throw new Error(insertError.message || "Failed to create event.");
-    }
-
-    // alert("Event created successfully!");
-    router.push("/");
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message || "Something went wrong creating the event.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -164,7 +164,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           <Card className="max-w-2xl mx-auto">
             <form onSubmit={handleSubmit} className="flex flex-col">
               <CardHeader>
-                <h1 className="text-2xl font-bold text-[#258EA6]">Create New Event</h1>
+                <h1 className="text-2xl font-bold text-[#258EA6]">
+                  Create New Event
+                </h1>
               </CardHeader>
 
               <CardContent>
@@ -193,7 +195,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                   {/* Upload Button */}
                   <div>
-                    <Button type="button" onClick={handleUploadClick} className="bg-[var(--primary-color)] text-white hover:brightness-95">
+                    <Button
+                      type="button"
+                      onClick={handleUploadClick}
+                      className="bg-[var(--primary-color)] text-white hover:brightness-95"
+                    >
                       Upload Image
                     </Button>
                   </div>
@@ -258,18 +264,36 @@ const handleSubmit = async (e: React.FormEvent) => {
                   {/* Date + Times */}
                   <div className="flex gap-4 flex-wrap">
                     <div className="flex-1 min-w-[120px]">
-                      <label className="block text-sm font-medium mb-1">Date</label>
-                      <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                      <label className="block text-sm font-medium mb-1">
+                        Date
+                      </label>
+                      <Input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-[120px]">
-                      <label className="block text-sm font-medium mb-1">Start Time</label>
-                      <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                      <label className="block text-sm font-medium mb-1">
+                        Start Time
+                      </label>
+                      <Input
+                        type="time"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-[120px]">
-                      <label className="block text-sm font-medium mb-1">End Time</label>
-                      <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+                      <label className="block text-sm font-medium mb-1">
+                        End Time
+                      </label>
+                      <Input
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                      />
                     </div>
                   </div>
 
@@ -282,7 +306,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                     />
                     Make this event private
                   </label>
-
                 </div>
               </CardContent>
 
@@ -296,7 +319,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                   )}
 
                   <div className="ml-auto">
-                    <Button type="submit" disabled={loading} className="bg-[var(--primary-color)] text-white py-2 rounded-lg font-semibold hover:brightness-95 disabled:opacity-60">
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="bg-[var(--primary-color)] text-white py-2 rounded-lg font-semibold hover:brightness-95 disabled:opacity-60"
+                    >
                       {loading ? "Creating..." : "Create Event"}
                     </Button>
                   </div>

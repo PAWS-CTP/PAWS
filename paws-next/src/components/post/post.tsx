@@ -160,6 +160,7 @@ const handleAddComment = async (e: React.FormEvent) => {
   e.preventDefault();
   if (!newComment.trim()) return;
 
+  // get current user
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -170,19 +171,22 @@ const handleAddComment = async (e: React.FormEvent) => {
     return;
   }
 
+  // look up username from users table (optional, just for display)
   const { data: userInfo } = await supabase
     .from("users")
     .select("username")
     .eq("id", userId)
     .single();
 
+  // 🔴 IMPORTANT: include user_id in the insert
   const { data: inserted, error } = await supabase
     .from("comments")
     .insert([
       {
         events_id: event.id,
         content: newComment.trim(),
-        username: userInfo?.username,
+        username: userInfo?.username ?? null,
+        user_id: userId,             // <-- needed for RLS policy
       },
     ])
     .select();
@@ -192,19 +196,21 @@ const handleAddComment = async (e: React.FormEvent) => {
     return;
   }
 
+  // update local UI
+  setComments((prev) => [
+    ...prev,
+    {
+      id: inserted[0].id,
+      content: inserted[0].content,
+      username: inserted[0].username,
+      userProfilePicUrl: inserted[0].user_profile_pic_url,
+      created_at: inserted[0].created_at,
+    },
+  ]);
 
-setComments((prev) => [
-  ...prev,
-  {
-    id: inserted[0].id,
-    content: inserted[0].content,
-    username: inserted[0].username,
-    userProfilePicUrl: inserted[0].user_profile_pic_url,
-    timestamp: inserted[0].created_at, // ✅ use created_at
-  },
-]);
   setNewComment("");
 };
+
 
 
   return (
