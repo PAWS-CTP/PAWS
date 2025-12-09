@@ -75,34 +75,33 @@ export default function SignInPage() {
     >
       <div className="w-full max-w-4xl rounded-xl overflow-hidden shadow-lg grid md:grid-cols-2 min-h-[520px]">
         {/* Left: form */}
-        <div className="bg-[#0f1724] text-white p-10">
+          <div className="bg-[#fafaf6] text-slate-900 p-10">
           <div className="max-w-md mx-auto">
             <h2 className="text-2xl font-semibold mb-1">Welcome back</h2>
-            <p className="text-sm text-slate-400 mb-6">Login to your PAWS account</p>
+              <p className="text-sm text-slate-600 mb-6">Login to your PAWS account</p>
 
             <form onSubmit={handlePasswordSignIn} className="space-y-4">
               <div>
                 <label className="block text-xs text-slate-400 mb-1">Email</label>
-                <Input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="m@example.com"
-                  className="bg-slate-800 border-slate-700 text-white"
-                />
+                  <Input
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="m@example.com"
+                    className="bg-white border-slate-200 text-slate-900"
+                  />
               </div>
 
               <div>
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs text-slate-400 mb-1">Password</label>
-                  <a className="text-xs text-slate-400">Forgot your password?</a>
+                  <label className="block text-xs text-slate-600 mb-1">Password</label>
                 </div>
-                <Input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder=""
-                  type="password"
-                  className="bg-slate-800 border-slate-700 text-white"
-                />
+                  <Input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder=""
+                    type="password"
+                    className="bg-white border-slate-200 text-slate-900"
+                  />
               </div>
 
               {error && <div className="text-sm text-red-400">{error}</div>}
@@ -128,7 +127,7 @@ export default function SignInPage() {
               </div>
 
               <div className="text-center text-xs text-slate-400 mt-4">
-                Don't have an account? <a href="/signup" className="text-white underline">Sign up</a>
+                 Don't have an account? <a href="/signup" className="text-slate-900 underline">Sign up</a>
               </div>
             </form>
           </div>

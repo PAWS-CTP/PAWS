@@ -157,6 +157,26 @@ body {
   100% { transform: scale(1); filter: brightness(1); }
 }
 
+/* Profile dropdown animations */
+.profile-dropdown-enter {
+  transform-origin: top right;
+  animation: dropdownIn 180ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+.profile-dropdown-exit {
+  transform-origin: top right;
+  animation: dropdownOut 160ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes dropdownOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-6px) scale(0.98); }
+}
+
 /* Scoped hover override: use secondary color for buttons inside feed/profile */
 .feed-page [data-slot="button"]:hover,
 .profile-page [data-slot="button"]:hover {

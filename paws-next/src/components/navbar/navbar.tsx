@@ -183,6 +183,8 @@ function MobileMenu({ open, setOpen, onSearch }: { open: boolean; setOpen: (v: b
 
 function ProfileMenu() {
     const [open, setOpen] = useState(false)
+    const [visible, setVisible] = useState(false)
+    const [exiting, setExiting] = useState(false)
     const [username, setUsername] = useState<string | null>(null)
     const router = useRouter()
 
@@ -202,6 +204,21 @@ function ProfileMenu() {
         return () => { mounted = false }
     }, [])
 
+    // Handle mount/unmount with a short exit animation
+    useEffect(() => {
+        if (open) {
+            setVisible(true)
+            setExiting(false)
+        } else if (visible) {
+            setExiting(true)
+            const t = setTimeout(() => {
+                setVisible(false)
+                setExiting(false)
+            }, 180)
+            return () => clearTimeout(t)
+        }
+    }, [open])
+
     return (
         <div className="relative">
             <button
@@ -215,9 +232,9 @@ function ProfileMenu() {
                 <svg width="12" height="12" viewBox="0 0 24 24" className="ml-1 text-gray-500" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
 
-            {open && (
-                <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-50">
-                    <Link href="/profile" onClick={() => setOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-50">Your profile</Link>
+            {visible && (
+                <div className={`absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-50 ${exiting ? 'profile-dropdown-exit' : 'profile-dropdown-enter'}`}>
+                    <Link href="/profile" onClick={() => { setOpen(false) }} className="block px-4 py-2 text-sm hover:bg-gray-50">Your profile</Link>
                     <button
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
                         onClick={async () => {

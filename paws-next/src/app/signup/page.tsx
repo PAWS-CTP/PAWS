@@ -75,42 +75,42 @@ export default function SignUpPage() {
     >
       <div className="w-full max-w-4xl rounded-xl overflow-hidden shadow-lg grid md:grid-cols-2 min-h-[560px]">
         {/* Left: sign up form */}
-        <div className="bg-[#0f1724] text-white p-10">
+        <div className="bg-[#fafaf6] text-slate-900 p-10">
           <div className="max-w-md mx-auto">
             <h2 className="text-2xl font-semibold mb-1">Create your account</h2>
-            <p className="text-sm text-slate-400 mb-6">Join PAWS to share pets and events with your community</p>
+            <p className="text-sm text-slate-600 mb-6">Join PAWS to share pets and events with your community</p>
 
             <form onSubmit={handleSignUp} className="space-y-4">
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Username</label>
+                <label className="block text-xs text-slate-600 mb-1">Username</label>
                 <Input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter a username"
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-white border-slate-200 text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Email</label>
+                <label className="block text-xs text-slate-600 mb-1">Email</label>
                 <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-white border-slate-200 text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Password</label>
+                <label className="block text-xs text-slate-600 mb-1">Password</label>
                 <div className="relative">
                   <Input
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password"
                     type={showPassword ? 'text' : 'password'}
-                    className="bg-slate-800 border-slate-700 text-white pr-12"
+                    className="bg-white border-slate-200 text-slate-900 pr-12"
                   />
                   <button
                     type="button"
@@ -123,14 +123,14 @@ export default function SignUpPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Confirm password</label>
+                <label className="block text-xs text-slate-600 mb-1">Confirm password</label>
                 <div className="relative">
                   <Input
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm password"
                     type={showPassword ? 'text' : 'password'}
-                    className="bg-slate-800 border-slate-700 text-white pr-12"
+                    className="bg-white border-slate-200 text-slate-900 pr-12"
                   />
                 </div>
               </div>
@@ -157,8 +157,8 @@ export default function SignUpPage() {
                 </Button>
               </div>
 
-              <div className="text-center text-xs text-slate-400 mt-4">
-                Already have an account? <a href="/signin" className="text-white underline">Sign in</a>
+              <div className="text-center text-xs text-slate-600 mt-4">
+                Already have an account? <a href="/signin" className="text-slate-900 underline">Sign in</a>
               </div>
             </form>
           </div>
