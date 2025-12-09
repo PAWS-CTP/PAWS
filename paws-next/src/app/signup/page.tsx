@@ -67,10 +67,10 @@ export default function SignUpPage() {
           <h2 className="text-2xl font-semibold mb-4">Create an account</h2>
           <form onSubmit={handleSignUp} className="flex flex-col gap-3">
           <input className="border p-2 rounded" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input className="border p-2 rounded" placeholder="Username (optional)" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input className="border p-2 rounded" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           <input className="border p-2 rounded" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           {error && <div className="text-red-500 text-sm">{error}</div>}
-          <button disabled={loading} className="bg-blue-500 text-white py-2 rounded mt-1">{loading ? 'Creating…' : 'Sign Up'}</button>
+          <button disabled={loading} className="text-white px-4 py-2 rounded w-full mt-1" style={{ background: 'var(--primary-color)' }}>{loading ? 'Creating…' : 'Sign Up'}</button>
           {message && (
             <div className="flex items-center justify-center gap-2 mt-2">
               {success && <div className="border-4 border-gray-200 border-t-blue-500 rounded-full w-5 h-5 animate-spin" role="status" aria-label="loading"></div>}

@@ -4,30 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-let supabase: any
-
-if (supabaseUrl && supabaseAnonKey) {
-  supabase = createClient(supabaseUrl, supabaseAnonKey)
-} else {
-  // Don't throw during module import — warn and provide a safe stub so client bundles don't crash.
-  // Runtime calls will receive a clear error which the UI can handle.
-  // This is useful in environments (like preview/workspaces) where env vars may not be set.
-  // eslint-disable-next-line no-console
-  console.warn('Supabase not configured: NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing')
-
-  supabase = {
-    auth: {
-      signInWithOAuth: async () => {
-        throw new Error('Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
-      },
-      // minimal stub for other auth methods if needed
-      signOut: async () => {
-        throw new Error('Supabase is not configured')
-      },
-      getUser: async () => ({ data: null, error: new Error('Supabase is not configured') }),
-    },
-  }
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Set these env vars before starting the app.')
 }
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export { supabase }
 export default supabase

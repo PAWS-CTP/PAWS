@@ -24,7 +24,7 @@ export default function Home() {
               </div>
               <div style={{ width: 160 }} className="flex items-center justify-end">
                 <Link href="/profile/edit">
-                  <button className="bg-blue-500 text-white py-2 px-4 rounded">Edit Profile</button>
+                  <button className="text-white py-2 px-4 rounded" style={{ background: 'var(--primary-color)' }}>Edit Profile</button>
                 </Link>
               </div>
             </div>

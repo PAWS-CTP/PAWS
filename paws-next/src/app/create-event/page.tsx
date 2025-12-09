@@ -3,7 +3,6 @@
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar/navbar";
-import Sidebar from "@/components/sidebar/sidebar";
 import { supabase } from "@/lib/supabaseClient";
 import { CITIES } from "@/lib/cities";
 
@@ -127,8 +126,6 @@ const CreateEventPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="flex">
-        <Sidebar />
-
         <main className="flex-1 p-8">
           <h1 className="text-3xl font-bold text-[#258EA6] mb-6">
             Create New Event
