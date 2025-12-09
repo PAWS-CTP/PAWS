@@ -19,10 +19,22 @@ export default function SignInPage() {
       // Request Supabase to redirect back to the feed after the OAuth flow completes.
       // Must match an entry in Supabase Auth -> Settings -> Redirect URLs.
       const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } as any } as any)
-      if (error) {
-        alert(error.message)
+      // Log redirect target to help debug redirect / allowed URL issues
+      // eslint-disable-next-line no-console
+      console.debug('Starting Google OAuth, redirectTo=', redirectTo)
+
+      const result = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
+      // eslint-disable-next-line no-console
+      console.debug('supabase.auth.signInWithOAuth result:', result)
+
+      // In many cases Supabase will immediately redirect the browser to Google.
+      // If an error is returned immediately, surface it to the user and stop loading.
+      if ((result as any).error) {
+        // eslint-disable-next-line no-console
+        console.warn('OAuth signIn error', (result as any).error)
+        alert((result as any).error.message || 'OAuth sign in failed')
         setLoading(false)
+        return
       }
       // Supabase will redirect to Google; when the flow completes it will return to your configured redirect URL
     } catch (err) {

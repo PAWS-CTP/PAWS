@@ -64,7 +64,7 @@ export default function Sidebar() {
                     </ul>
                     <div className="sidebar-footer mt-auto">
                         <Link
-                            href="/create-post"
+                            href="/create-event"
                         >
                         <Image
                             src={pawsCreatePostButton}

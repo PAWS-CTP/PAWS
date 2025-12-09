@@ -55,9 +55,16 @@ export default function EditProfilePage() {
       }
 
       const updates = { username, bio }
-      const { error } = await supabase.from('users').upsert({ id: userId, ...updates })
+      // Use onConflict to target the `id` column explicitly. This helps avoid duplicate-key
+      // errors on other unique columns (like email) when the row for this id already exists.
+      const { error } = await supabase.from('users').upsert({ id: userId, ...updates }, { onConflict: 'id' })
       if (error) {
-        setError(error.message)
+        // Handle duplicate-email unique constraint with a clearer message
+        if (error.code === '23505' || /duplicate key value/.test(error.message || '')) {
+          setError('A user with this email already exists. Please use a different email.')
+        } else {
+          setError(error.message)
+        }
         return
       }
 
