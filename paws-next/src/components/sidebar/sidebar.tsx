@@ -68,7 +68,7 @@ export default function Sidebar() {
                         >
                         <Image
                             src={pawsCreatePostButton}
-                            alt="Create Post"
+                            alt="Create Event"
                             style={{ height: '64px', width: 'auto', marginRight: '0.5rem' }}
                         />
                         </Link>
