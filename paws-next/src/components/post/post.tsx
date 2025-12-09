@@ -21,13 +21,10 @@ export type EventRow = {
   start_time: string | null;  // ISO string
   end_time: string | null;    // ISO string
   privacy: boolean | null;
-  //like_count?: number | null; // <-- AFTER you add this column
 };
 
 type PostProps = {
   event: EventRow;
- // for likes and comments in local state for now
-  initialComments?: CommentType[];
 };
 
 const formatDate = (dateStr?: string | null) => {
@@ -49,7 +46,6 @@ const formatTime = (iso?: string | null) => {
 
 export default function Post({ 
   event,
-  initialComments = [],
 }: PostProps) {
   // local storage for now
   const [likes, setLikes] = useState(0);
@@ -57,7 +53,7 @@ export default function Post({
   const [pulsing, setPulsing] = useState(false);
 
   // comments local state for now
-  const [comments, setComments] = useState<CommentType[]>(initialComments);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState("");
   const {
     title,
@@ -107,6 +103,21 @@ export default function Post({
     fetchLikes();
   }, [event.id]);
 
+    useEffect(() => {
+    const fetchComments = async () => {
+      const { data: commentData, error: commentError } = await supabase
+        .from("comments")
+        .select("*")
+        .eq("events_id", event.id);
+
+      if (commentError) console.error("Error fetching likes:", commentError);
+      else setComments(commentData || []);
+      console.log("comments",commentData)
+    };
+
+    fetchComments();
+  }, [event.id]);
+
   const handleLike = async () => {
     const {
       data: { session },
@@ -146,23 +157,56 @@ export default function Post({
       }
     }
   };
+const handleAddComment = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!newComment.trim()) return;
 
-    const handleAddComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-    const comment: CommentType = {
-      id: Date.now(), // simple unique ID
-      text: newComment.trim(),
-      username: "Anonymous Pawrent", // later: real username from users table
-      timestamp: Date.now(),
-      userProfilePicUrl:
-        "https://freesvg.org/img/abstract-user-flat-4.png", // later: real avatar
-    };
+  const userId = session?.user?.id;
+  if (!userId) {
+    console.log("User not logged in. Cannot comment on the post.");
+    return;
+  }
 
-    setComments((prev) => [...prev, comment]);
-    setNewComment("");
-  };
+  const { data: userInfo } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", userId)
+    .single();
+
+  const { data: inserted, error } = await supabase
+    .from("comments")
+    .insert([
+      {
+        events_id: event.id,
+        content: newComment.trim(),
+        username: userInfo?.username,
+      },
+    ])
+    .select();
+
+  if (error) {
+    console.log("error creating comment", error);
+    return;
+  }
+
+  // 👇 FIXED
+setComments((prev) => [
+  ...prev,
+  {
+    id: inserted[0].id,
+    content: inserted[0].content,
+    username: inserted[0].username,
+    userProfilePicUrl: inserted[0].user_profile_pic_url,
+    timestamp: inserted[0].created_at, // ✅ use created_at
+  },
+]);
+  setNewComment("");
+};
+
 
   return (
     <Card className="mb-6 max-w-lg mx-auto">
