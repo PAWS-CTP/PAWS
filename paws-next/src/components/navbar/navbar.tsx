@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import supabase from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabaseClient'
 import Image from 'next/image';
 import pawsLogo from '../../assets/PAWS_Logo_NoText.png';
 import { useRouter, usePathname } from 'next/navigation';

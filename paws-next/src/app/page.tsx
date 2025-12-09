@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../components/navbar/navbar";
 import Sidebar from "@/components/app-sidebar";
 import Post, { type EventRow } from "../components/post/post";
@@ -9,31 +9,44 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [checking, setChecking] = useState(true);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
 
+  // read filters from the URL
+  const city = searchParams.get("city")?.trim() || undefined;
+
+
   useEffect(() => {
     let mounted = true;
 
-    const check = async () => {
+    const load = async () => {
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (!session) {
-          // not signed in → redirect to sign-in
           router.replace("/signin");
           return;
         }
 
-        // signed in → load events
         setLoadingEvents(true);
-        const { data, error } = await supabase
+
+        // base query
+        let query = supabase
           .from("events")
           .select("*")
           .order("date", { ascending: false });
+
+        // filter by location if a city is present
+        if (city) {
+          query = query.ilike("location", `%${city}%`);
+        }
+
+        const { data, error } = await query;
 
         if (!mounted) return;
 
@@ -53,12 +66,13 @@ export default function Page() {
       }
     };
 
-    check();
+    load();
 
     return () => {
       mounted = false;
     };
-  }, [router]);
+    // re-run whenever the query string changes
+  }, [router, searchParams.toString(), city]);
 
   if (checking) {
     return (
@@ -71,7 +85,10 @@ export default function Page() {
   return (
     <>
       <Navbar />
-      <div className="bg-gray-50 feed-page" style={{ paddingTop: "var(--navbar-height,72px)" }}>
+      <div
+        className="bg-gray-50 feed-page"
+        style={{ paddingTop: "var(--navbar-height,72px)" }}
+      >
         <div className="flex flex-row">
           <div className="w-64 text-center">
             <Sidebar />
@@ -80,10 +97,20 @@ export default function Page() {
           <div className="flex-1 flex justify-center">
             <div className="w-full max-w-7xl px-6 py-8">
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-dashed border-slate-200 min-h-[420px]">
-                {loadingEvents && <p className="text-gray-500 text-sm mt-2">Loading events…</p>}
+                {city && (
+                  <p className="text-sm text-gray-500 mb-2">
+                    Showing events in: <span className="font-medium">{city}</span>
+                  </p>
+                )}
+
+                {loadingEvents && (
+                  <p className="text-gray-500 text-sm mt-2">Loading events…</p>
+                )}
 
                 {!loadingEvents && events.length === 0 && (
-                  <div className="text-gray-500 text-sm mt-2">No events yet. Create one to get started!</div>
+                  <div className="text-gray-500 text-sm mt-2">
+                    No events found{city ? ` for "${city}"` : ""}.
+                  </div>
                 )}
 
                 <div className="space-y-4 mt-4">
