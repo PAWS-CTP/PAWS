@@ -20,18 +20,8 @@ export default function Home() {
       <div className="bg-gray-50" style={{ paddingTop: 'var(--navbar-height,72px)' }}>
         <div className="flex justify-center">
           <div className="w-full max-w-5xl px-4">
-            <div className="py-10 grid grid-cols-1 md:grid-cols-[1fr_auto] items-start gap-6">
-              <div>
-                <ProfileHeader />
-              </div>
-              <div className="flex items-start justify-end">
-                <Link href="/profile/edit">
-                  <Button variant="primary" className="py-2 px-3 inline-flex items-center gap-2">
-                    <Edit size={16} />
-                    Edit Profile
-                  </Button>
-                </Link>
-              </div>
+            <div className="py-10">
+              <ProfileHeader />
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-4">

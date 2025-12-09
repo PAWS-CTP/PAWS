@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from 'react'
 import supabase from '@/lib/supabaseClient'
 import { Card, CardHeader } from '@/components/ui/card'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Edit } from 'lucide-react'
 
 type Profile = {
   id?: string
@@ -60,22 +63,33 @@ export default function ProfileHeader() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-6">
-          <div className="shrink-0">
-            {avatar ? (
-              <img src={avatar} alt={`${username} avatar`} className="w-28 h-28 rounded-full object-cover shadow-md" />
-            ) : (
-              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-white flex items-center justify-center text-3xl font-bold shadow-md">
-                {username ? username.charAt(0).toUpperCase() : 'Y'}
+        <div className="flex items-center gap-6 justify-between">
+          <div className="flex items-center gap-6">
+            <div className="shrink-0">
+              {avatar ? (
+                <img src={avatar} alt={`${username} avatar`} className="w-28 h-28 rounded-full object-cover shadow-md" />
+              ) : (
+                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-white flex items-center justify-center text-3xl font-bold shadow-md">
+                  {username ? username.charAt(0).toUpperCase() : 'Y'}
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-extrabold text-teal-600 truncate">{loading ? 'Loading…' : username}</h2>
               </div>
-            )}
+              <p className="mt-2 text-sm text-gray-600">{bio || 'No bio yet'}</p>
+            </div>
           </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-extrabold text-teal-600 truncate">{loading ? 'Loading…' : username}</h2>
-            </div>
-            <p className="mt-2 text-sm text-gray-600">{bio || 'No bio yet'}</p>
+          <div className="flex items-start">
+            <Link href="/profile/edit">
+              <Button variant="primary" className="py-2 px-3 inline-flex items-center gap-2">
+                <Edit size={16} />
+                Edit Profile
+              </Button>
+            </Link>
           </div>
         </div>
       </CardHeader>

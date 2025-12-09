@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import supabase from '@/lib/supabaseClient'
 import Image from 'next/image';
 import pawsLogo from '../../assets/PAWS_Logo_NoText.png';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import SearchBar from '../search/searchbar';
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -28,31 +28,37 @@ const Navbar: React.FC = () => {
                                 <Image src={pawsLogo} alt="PAWS" width={32} height={32} />
                             </button>
                         </div>
+
+                        {/* Pinned Sign Out on the far right edge of the screen */}
+                        <div className="absolute right-4 top-0 h-16 flex items-center">
+                            <div className="hidden md:block">
+                                <Button variant="ghost" className="py-1 px-3 cursor-pointer" onClick={async () => {
+                                    try {
+                                        if (supabase && supabase.auth && typeof supabase.auth.signOut === 'function') {
+                                            await supabase.auth.signOut()
+                                        }
+                                    } catch (err) {
+                                        console.warn('Sign out failed:', err)
+                                    } finally {
+                                        router.push('/signin')
+                                    }
+                                }}>Sign Out</Button>
+                            </div>
+                        </div>
+
                         <div className="flex h-16 items-center justify-between">
                             <div className="flex items-center gap-4 justify-center w-full">
-                                <nav className="hidden md:flex items-center space-x-2">
+                                <nav className="hidden md:flex items-center space-x-2 mr-4">
                                     <NavItems />
                                 </nav>
+
+                                {/* Centered search */}
+                                <div className="hidden md:block">
+                                    <SearchBar onSearch={handleSearch} />
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <div className="hidden lg:block">
-                                    <SearchBar onSearch={handleSearch} />
-                                </div>
-                                <div className="hidden md:flex items-center gap-2">
-                                    <Button variant="ghost" className="py-1 px-3 cursor-pointer" onClick={async () => {
-                                        try {
-                                            if (supabase && supabase.auth && typeof supabase.auth.signOut === 'function') {
-                                                    await supabase.auth.signOut()
-                                            }
-                                        } catch (err) {
-                                            console.warn('Sign out failed:', err)
-                                        } finally {
-                                            router.push('/signin')
-                                        }
-                                    }}>Sign Out</Button>
-                                </div>
-
                                 {/* Hamburger for small screens */}
                                 <MobileMenu />
                             </div>
@@ -64,7 +70,10 @@ const Navbar: React.FC = () => {
 
 function NavItems() {
         const router = useRouter();
-        const pathname = (typeof window !== 'undefined') ? window.location.pathname : '/';
+        const pathname = usePathname() || '/';
+
+        // Hide Feed/Profile links when we're already on the feed page
+        if (pathname === '/') return null;
 
         const isActive = (path: string) => {
                 if (path === '/') return pathname === '/';
@@ -75,7 +84,7 @@ function NavItems() {
             <>
                 <Link href="/" className={`px-3 py-1 rounded-md text-sm font-medium cursor-pointer ${isActive('/') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'}`}>Feed</Link>
                 <Link href="/profile" className={`px-3 py-1 rounded-md text-sm font-medium cursor-pointer ${isActive('/profile') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'}`}>Profile</Link>
-                <Link href="/settings" className={`px-3 py-1 rounded-md text-sm font-medium cursor-pointer ${isActive('/settings') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'}`}>Settings</Link>
+                {/* Settings removed */}
             </>
         )
 }
@@ -83,6 +92,7 @@ function NavItems() {
 function MobileMenu() {
     const [open, setOpen] = useState(false)
     const router = useRouter()
+    const pathname = usePathname ? usePathname() : (typeof window !== 'undefined' ? window.location.pathname : '/')
 
     return (
         <>
@@ -102,10 +112,13 @@ function MobileMenu() {
                             <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-gray-100">✕</button>
                         </div>
 
-                        <nav className="flex flex-col gap-2">
-                            <Link href="/" onClick={() => setOpen(false)} className="px-2 py-2 rounded-md hover:bg-gray-100">Feed</Link>
-                            <Link href="/profile" onClick={() => setOpen(false)} className="px-2 py-2 rounded-md hover:bg-gray-100">Profile</Link>
-                            <Link href="/settings" onClick={() => setOpen(false)} className="px-2 py-2 rounded-md hover:bg-gray-100">Settings</Link>
+                            <nav className="flex flex-col gap-2">
+                            {pathname !== '/' && (
+                                <>
+                                    <Link href="/" onClick={() => setOpen(false)} className="px-2 py-2 rounded-md hover:bg-gray-100">Feed</Link>
+                                    <Link href="/profile" onClick={() => setOpen(false)} className="px-2 py-2 rounded-md hover:bg-gray-100">Profile</Link>
+                                </>
+                            )}
                             <Link href="/create-event" onClick={() => setOpen(false)} className="px-2 py-2 rounded-md hover:bg-gray-100">Create Event</Link>
                             <button
                                 className="text-left px-2 py-2 rounded-md hover:bg-gray-100"
