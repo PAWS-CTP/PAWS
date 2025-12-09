@@ -6,13 +6,13 @@ export type Comment = {
     id: number;           // for uniquely identifying each comment
     content: string;         // the comment content
     username: string;     // who wrote it
-    timestamp: string;    // when it was written
+    created_at: string;    // when it was written
     userProfilePicUrl: string;  // commenter's profile picture
 }
 
 
-export default function Comment({ content, username, timestamp, userProfilePicUrl }: Comment) {
-    const date = new Date(timestamp);
+export default function Comment({ content, username, created_at, userProfilePicUrl }: Comment) {
+    const date = new Date(created_at);
     const formattedDate = isNaN(date.getTime()) ? "Unknown date" : date.toLocaleString();
     return (
         <div className="comment">
