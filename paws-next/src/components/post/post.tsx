@@ -192,7 +192,7 @@ const handleAddComment = async (e: React.FormEvent) => {
     return;
   }
 
-  // 👇 FIXED
+
 setComments((prev) => [
   ...prev,
   {

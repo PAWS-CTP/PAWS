@@ -133,7 +133,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         end_time: endDateTime.toISOString(),
         img_url: publicUrl,
         privacy: isPrivate,
-        username: creatorUsername, // 👈 this populates your events.username column
+        username: creatorUsername, // this populates your events.username column
       },
     ]);
 
