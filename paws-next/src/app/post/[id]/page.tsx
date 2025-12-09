@@ -1,5 +1,6 @@
 import React from 'react'
 import supabase from '@/lib/supabaseClient'
+import Post, { type EventRow } from '@/components/post/post'
 
 type Props = { params: { id: string } }
 
@@ -28,16 +29,25 @@ export default async function PostPage({ params }: Props) {
     )
   }
 
+  // Map the `posts` row shape to the `EventRow` shape expected by the Post card.
+  const event: EventRow = {
+    id: post.id,
+    created_at: post.created_at ?? new Date().toISOString(),
+    title: post.username ?? 'Post',
+    description: post.caption ?? null,
+    img_url: post.img_url ?? null,
+    location: null,
+    date: null,
+    start_time: null,
+    end_time: null,
+    privacy: null,
+  }
+
   return (
     <div style={{ paddingTop: 'var(--navbar-height,72px)' }} className="flex items-center justify-center">
       <div style={{ maxWidth: 800, width: '100%', padding: 20 }}>
-        <div className="bg-white rounded shadow p-4">
-          <img src={post.img_url} alt="post" className="w-full object-cover rounded" />
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold">{post.username || 'Unknown'}</h2>
-            <p className="text-gray-700 mt-2">{post.caption}</p>
-          </div>
-        </div>
+        {/* Render the shared Post card component for a consistent detail view */}
+        <Post event={event} initialLikes={post.like_count ?? 0} initialComments={[]} />
       </div>
     </div>
   )
