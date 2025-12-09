@@ -6,10 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import PawIcon from '@/components/icons/Paw'
-/**
- * Current shape of the `events` table.
- * Update this later if you add more columns (user_id, like_count, etc.).
- */
+
 export type EventRow = {
   id: string;
   created_at: string;
@@ -21,6 +18,7 @@ export type EventRow = {
   start_time: string | null;  // ISO string
   end_time: string | null;    // ISO string
   privacy: boolean | null;
+  username: string | null;
 };
 
 type PostProps = {
@@ -64,6 +62,7 @@ export default function Post({
     start_time,
     end_time,
     created_at,
+    username,
   } = event;
 
   const eventDate = formatDate(date ?? created_at);
@@ -213,12 +212,22 @@ setComments((prev) => [
       <CardHeader>
         <div className="flex items-start justify-between w-full">
           <div>
-            <h3 className="text-lg font-semibold">{title || "Untitled event"}</h3>
-            <div className="text-sm text-muted-foreground mt-1">
+            {/* username line */}
+            <div className="text-sm font-semibold">
+              @{username ?? "unknown_user"}
+            </div>
+
+            {/* meta line: date / time / location */}
+            <div className="text-xs text-muted-foreground mt-1">
               {eventDate}
               {start && end && ` · ${start} – ${end}`}
               {location && ` · 📍 ${location}`}
             </div>
+
+            {/* title */}
+            <h3 className="text-lg font-semibold mt-2">
+              {title || "Untitled event"}
+            </h3>
           </div>
         </div>
       </CardHeader>
@@ -282,28 +291,4 @@ setComments((prev) => [
   );
   }
 
-/**
- * 🔁 LATER CHANGES:
- * - When you add like_count to events:
- *     type EventRow = { ...; like_count: number | null };
- *     and in Post:
- *       initialLikes = event.like_count ?? 0;
- *       plus a Supabase update in handleLike.
- *
- * - When you join events with users:
- *     extend PostProps to take username + avatar and render them in the header.
- *
- * - When you add comments table:
- *     you can bring back your old comments UI and load/save via Supabase.
- */
 
-          // {/* Add new comment form */}
-          // <form className="comment-form text-color" onSubmit={handleAddComment}>
-          //   <input
-          //     type="text"
-          //     value={newComment}
-          //     onChange={(e) => setNewComment(e.target.value)}
-          //     placeholder="Add a comment..."
-          //     className="comment-input text-color"
-          //   />
-          //   <button type="submit" className="comment-submit">Post</button>

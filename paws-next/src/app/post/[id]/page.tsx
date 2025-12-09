@@ -41,13 +41,14 @@ export default async function PostPage({ params }: Props) {
     start_time: null,
     end_time: null,
     privacy: null,
+    username: post.username ?? 'Anonymous',
   }
 
   return (
     <div style={{ paddingTop: 'var(--navbar-height,72px)' }} className="flex items-center justify-center">
       <div style={{ maxWidth: 800, width: '100%', padding: 20 }}>
         {/* Render the shared Post card component for a consistent detail view */}
-        <Post event={event} initialLikes={post.like_count ?? 0} initialComments={[]} />
+        <Post event={event} />
       </div>
     </div>
   )

@@ -49,81 +49,108 @@ const CreateEventPage: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    // basic validation
-    if (!title || !location || !date || !startTime || !endTime) {
-      setError(
-        "Please fill out title, location, date, start time, and end time."
-      );
-      return;
+  // basic validation
+  if (!title || !location || !date || !startTime || !endTime) {
+    setError("Please fill out title, location, date, start time, and end time.");
+    return;
+  }
+  if (!image) {
+    setError("Please upload an image before creating the event.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // 0) get current logged-in user so we can look up their username
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      console.error("Session error:", sessionError);
+      throw new Error("Could not get current session.");
     }
-    if (!image) {
-      setError("Please upload an image before creating the event.");
-      return;
+
+    const userId = session?.user?.id;
+    if (!userId) {
+      throw new Error("You must be signed in to create an event.");
     }
 
-    setLoading(true);
+    // find username from your `users` table
+    let creatorUsername: string | null = null;
+    const { data: userRow, error: userError } = await supabase
+      .from("users")
+      .select("username")
+      .eq("id", userId)
+      .single();
 
-    try {
-      // 1) upload image to Supabase Storage
-      const fileExt = image.name.split(".").pop();
-      const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = `events/${fileName}`;
-      const BUCKET = "event_images";
-
-  
-      const { error: uploadError } = await supabase.storage
-        .from(BUCKET)
-        .upload(filePath, image, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        throw new Error(uploadError.message || "Failed to upload image.");
-      }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-
-      // 2) build ISO datetimes for start_time and end_time
-      const startDateTime = new Date(`${date}T${startTime}:00`);
-      const endDateTime = new Date(`${date}T${endTime}:00`);
-
-      // 3) insert event row into Supabase
-      const { error: insertError } = await supabase.from("events").insert([
-        {
-          title,
-          description,
-          location,
-          date, // 'YYYY-MM-DD' string is fine for a date column
-          start_time: startDateTime.toISOString(),
-          end_time: endDateTime.toISOString(),
-          img_url: publicUrl, // <-- correct column name
-          privacy: isPrivate,
-          // later: add user_id when Supabase Auth is wired
-        },
-      ]);
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        throw new Error(insertError.message || "Failed to create event.");
-      }
-
-      alert("Event created successfully!");
-      router.push("/"); // navigate to feed/home
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Something went wrong creating the event.");
-    } finally {
-      setLoading(false);
+    if (userError) {
+      console.warn("Could not load username for event:", userError);
+    } else {
+      creatorUsername = userRow?.username ?? null;
     }
-  };
+
+    // 1) upload image to Supabase Storage
+    const fileExt = image.name.split(".").pop();
+    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+    const filePath = `events/${fileName}`;
+    const BUCKET = "event_images";
+
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(filePath, image, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      throw new Error(uploadError.message || "Failed to upload image.");
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
+
+    // 2) build ISO datetimes
+    const startDateTime = new Date(`${date}T${startTime}:00`);
+    const endDateTime = new Date(`${date}T${endTime}:00`);
+
+    // 3) insert event row into Supabase, including username
+    const { error: insertError } = await supabase.from("events").insert([
+      {
+        title,
+        description,
+        location,
+        date,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime.toISOString(),
+        img_url: publicUrl,
+        privacy: isPrivate,
+        username: creatorUsername, // 👈 this populates your events.username column
+      },
+    ]);
+
+    if (insertError) {
+      console.error("Insert error:", insertError);
+      throw new Error(insertError.message || "Failed to create event.");
+    }
+
+    alert("Event created successfully!");
+    router.push("/");
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || "Something went wrong creating the event.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
