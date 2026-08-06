@@ -24,7 +24,7 @@ Community Feed – Discover trending pets, posts, and upcoming events.
 
 Frontend: React + TailwindCSS + Next.JS
 
-Backend: Node.js / Express
+Backend: Node.js 
 
 Database: Supabase
 
