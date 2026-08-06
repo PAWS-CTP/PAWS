@@ -28,6 +28,6 @@ Backend: Node.js / Express
 
 Database: Supabase
 
-Authentication: JWT / OAuth
+Authentication: Supabase
 
 Hosting: Vercel
